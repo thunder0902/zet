@@ -1,0 +1,49 @@
+# macOS
+.DS_Store
+
+# Node / JS
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+.pnpm-store/
+
+# Editor/IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+
+# Build / Temp
+dist/
+build/
+.tmp/
+.cache/
+
+# OpenClaw / local runtime
+/.openclaw/
+
+# Archives and backups
+*.zip
+*.tar.gz
+*.bak
+*~
+
+# OS junk
+Thumbs.db
+ehthumbs.db
+
+# Ignore system-specific git metadata copies
+*.orig
+
+# Keep game assets (images/audio) tracked — do NOT ignore assets/ or game/**/assets/
