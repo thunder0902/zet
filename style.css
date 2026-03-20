@@ -23,8 +23,8 @@ a{color:var(--accent)}
 .nav a:hover{color:var(--accent);background:rgba(255,255,255,0.02)}
 .nav-toggle{display:none;background:transparent;border:0;color:var(--muted);font-size:22px;padding:6px}
 
-/* ensure CTA / unusual bubble not happen */
-.cta{background:var(--accent);color:#042033;padding:8px 12px;border-radius:8px;text-decoration:none}
+/* ensure CTA is simple and non-floating */
+.cta{background:var(--accent);color:#042033;padding:8px 12px;border-radius:8px;text-decoration:none;display:inline-block}
 
 /* responsive */
 @media (max-width:720px){
@@ -32,6 +32,18 @@ a{color:var(--accent)}
   .nav{display:none;flex-direction:column;gap:8px;padding:12px;background:var(--card);border-radius:8px;margin-top:8px}
   .nav-toggle{display:block}
   .header-inner{flex-direction:row;align-items:center}
+  /* make CTA full-width and inline in nav when open */
+  .nav .cta{display:block;width:100%;text-align:center;padding:12px}
+  /* ensure no overlap with hero content */
+  .hero{padding-top:24px}
+}
+
+/* very narrow phones */
+@media (max-width:420px){
+  .brand{font-size:18px}
+  .nav a{padding:6px 8px;font-size:15px}
+  .container{padding:10px}
+  .hero{padding:28px 0}
 }
 
 @media (max-width:420px){
