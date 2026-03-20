@@ -13,3 +13,19 @@ nav .cta{background:var(--accent);color:#042033;padding:10px 14px;border-radius:
 .feature{background:var(--card);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
 .site-foot{border-top:1px solid rgba(255,255,255,0.03);padding:18px 0;margin-top:36px;text-align:center;color:var(--muted)}
 a{color:var(--accent)}
+
+/* header styles */
+.site-header{background:linear-gradient(180deg, rgba(0,0,0,0.12), transparent);border-bottom:1px solid rgba(255,255,255,0.03)}
+.header-inner{display:flex;align-items:center;justify-content:space-between}
+.brand{font-weight:800;color:#fff;text-decoration:none;font-size:20px}
+.nav{display:flex;gap:16px}
+.nav a{color:var(--muted);text-decoration:none;padding:8px;border-radius:8px}
+.nav a:hover{color:var(--accent);background:rgba(255,255,255,0.02)}
+.nav-toggle{display:none;background:transparent;border:0;color:var(--muted);font-size:20px}
+
+/* responsive */
+@media (max-width:720px){
+  .container{padding:16px}
+  .nav{display:none}
+  .nav-toggle{display:block}
+}
