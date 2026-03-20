@@ -33,3 +33,10 @@ a{color:var(--accent)}
   .nav-toggle{display:block}
   .header-inner{flex-direction:row;align-items:center}
 }
+
+@media (max-width:420px){
+  .brand{font-size:18px}
+  .nav a{padding:6px 8px;font-size:15px}
+  .container{padding:10px}
+  .hero{padding:28px 0}
+}
