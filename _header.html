@@ -1,11 +1,31 @@
 <header class="site-header">
   <div class="container header-inner">
     <a class="brand" href="/">ZET</a>
-    <nav class="nav">
+    <nav class="nav" id="site-nav">
       <a href="/">Home</a>
       <a href="/games/">Games</a>
       <a href="https://github.com/thunder0902/zet" target="_blank" rel="noopener">GitHub</a>
     </nav>
-    <button class="nav-toggle" aria-label="메뉴">☰</button>
+    <button class="nav-toggle" id="nav-toggle" aria-label="메뉴">☰</button>
   </div>
 </header>
+<script>
+// simple accessible nav toggle
+(function(){
+  const btn = document.getElementById('nav-toggle');
+  const nav = document.getElementById('site-nav');
+  if(!btn||!nav) return;
+  btn.addEventListener('click', ()=>{
+    const expanded = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!expanded));
+    nav.style.display = expanded ? '' : 'flex';
+  });
+  // ensure nav starts hidden on small screens
+  function update(){
+    if(window.innerWidth<=720){ nav.style.display='none'; btn.style.display='block'; btn.setAttribute('aria-expanded','false'); }
+    else { nav.style.display='flex'; btn.style.display='none'; btn.setAttribute('aria-expanded','true'); }
+  }
+  window.addEventListener('resize', update);
+  update();
+})();
+</script>

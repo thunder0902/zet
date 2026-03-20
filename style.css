@@ -15,17 +15,21 @@ nav .cta{background:var(--accent);color:#042033;padding:10px 14px;border-radius:
 a{color:var(--accent)}
 
 /* header styles */
-.site-header{background:linear-gradient(180deg, rgba(0,0,0,0.12), transparent);border-bottom:1px solid rgba(255,255,255,0.03)}
+.site-header{background:linear-gradient(180deg, rgba(0,0,0,0.08), transparent);border-bottom:1px solid rgba(255,255,255,0.03);position:sticky;top:0;z-index:50}
 .header-inner{display:flex;align-items:center;justify-content:space-between}
 .brand{font-weight:800;color:#fff;text-decoration:none;font-size:20px}
-.nav{display:flex;gap:16px}
+.nav{display:flex;gap:12px;align-items:center}
 .nav a{color:var(--muted);text-decoration:none;padding:8px;border-radius:8px}
 .nav a:hover{color:var(--accent);background:rgba(255,255,255,0.02)}
-.nav-toggle{display:none;background:transparent;border:0;color:var(--muted);font-size:20px}
+.nav-toggle{display:none;background:transparent;border:0;color:var(--muted);font-size:22px;padding:6px}
+
+/* ensure CTA / unusual bubble not happen */
+.cta{background:var(--accent);color:#042033;padding:8px 12px;border-radius:8px;text-decoration:none}
 
 /* responsive */
 @media (max-width:720px){
-  .container{padding:16px}
-  .nav{display:none}
+  .container{padding:12px}
+  .nav{display:none;flex-direction:column;gap:8px;padding:12px;background:var(--card);border-radius:8px;margin-top:8px}
   .nav-toggle{display:block}
+  .header-inner{flex-direction:row;align-items:center}
 }
