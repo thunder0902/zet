@@ -36,6 +36,8 @@ a{color:var(--accent)}
   .nav .cta{display:block;width:100%;text-align:center;padding:12px}
   /* ensure no overlap with hero content */
   .hero{padding-top:24px}
+  /* when header has nav-open, show nav and position it */
+  .site-header.nav-open .nav{display:flex;position:absolute;left:12px;right:12px;top:64px;z-index:60}
 }
 
 /* very narrow phones */
