@@ -4,13 +4,29 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>ZET — dhole.digital</title>
-  <style>body{font-family:system-ui, -apple-system,Segoe UI,Roboto,sans-serif;display:grid;place-items:center;height:100vh;margin:0;background:#071026;color:#e6f0ff}a{color:#22d3ee;text-decoration:none;font-weight:700}</style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div style="text-align:center">
-    <h1>ZET</h1>
-    <p>윤코형님 게임 포털</p>
-    <p><a href="/games/">게임 보러가기 →</a></p>
-  </div>
+  <header class="site-head">
+    <div class="container">
+      <h1>ZET</h1>
+      <p class="tagline">윤코형님 게임 포털 — 공포 게임과 실험작 모음</p>
+      <nav><a class="cta" href="/games/">게임 보러가기</a></nav>
+    </div>
+  </header>
+  <main class="hero">
+    <div class="container">
+      <h2>요약</h2>
+      <p>여기는 윤코형님이 만든 게임들을 모아놓은 공간입니다. 간단한 웹 기반 플레이와 다운로드를 지원합니다.</p>
+      <section class="features">
+        <div class="feature"><h3>빠른 접근</h3><p>게임 목록은 <a href="/games/">/games</a> 에서 확인하세요.</p></div>
+        <div class="feature"><h3>배포 자동화</h3><p>GitHub Pages로 자동 배포됩니다.</p></div>
+        <div class="feature"><h3>피드백 환영</h3><p>버그/개선 사항은 이 리포에 이슈로 올려주세요.</p></div>
+      </section>
+    </div>
+  </main>
+  <footer class="site-foot">
+    <div class="container">© 2026 윤코형님 — dhole.digital</div>
+  </footer>
 </body>
 </html>
