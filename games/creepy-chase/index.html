@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>은신추격: 이상한 복도</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <h1>은신추격: 이상한 복도</h1>
+    <p class="subtitle">소리를 내지 말고, 숨고, 도망쳐라.</p>
+
+    <div class="hud">
+      <div>발각도: <span id="alert">0</span>%</div>
+      <div>스태미나: <span id="stam">100</span></div>
+      <div>위치: <span id="loc">?</span></div>
+    </div>
+
+    <div id="log" class="log"></div>
+    <div id="choices" class="choices"></div>
+
+    <div class="footer">
+      <button id="restart" class="ghost">처음부터</button>
+      <span class="tip">팁: 숨기 전에 숨소리를 줄여라</span>
+    </div>
+  </div>
+
+  <audio id="step" src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=" preload="auto"></audio>
+  <script src="game.js"></script>
+</body>
+</html>

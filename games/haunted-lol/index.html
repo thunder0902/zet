@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>지하철 막차 공포게임</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app" class="screen">
+    <h1>지하철 막차 공포게임</h1>
+    <p class="subtitle">불 꺼진 승강장, 너 혼자 남았다…</p>
+    <div id="game" class="card"></div>
+    <div class="footer">
+      <button id="restart" class="ghost">처음부터</button>
+      <div id="stats"></div>
+    </div>
+  </div>
+  <audio id="beep" src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA=" preload="auto"></audio>
+  <script src="game.js"></script>
+</body>
+</html>

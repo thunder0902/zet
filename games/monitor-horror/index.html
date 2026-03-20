@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>모니터 너머</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="root">
+  <div id="header">
+    <span id="title-text">탐험 게임 v1.0</span>
+    <span id="playtime"></span>
+  </div>
+  <div id="screen">
+    <canvas id="game" width="780" height="440"></canvas>
+    <div id="glitch-overlay"></div>
+    <div id="eye" style="display:none">👁</div>
+  </div>
+  <div id="log-wrap">
+    <div id="log"></div>
+  </div>
+  <div id="choices"></div>
+  <div id="status-bar">
+    <span id="coord"></span>
+    <span id="sys-msg"></span>
+  </div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>

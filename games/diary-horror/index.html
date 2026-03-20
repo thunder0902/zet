@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>일기장 — 낡은 집에서 발견된 것</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <!-- 인트로 화면 -->
+  <div id="intro-screen">
+    <div id="intro-content">
+      <div id="intro-title">낡은 일기장</div>
+      <div id="intro-sub">누군가 남기고 간 것</div>
+      <div id="intro-desc">폐가 정리 작업 중 오래된 일기장을 발견했다.<br>첫 페이지를 펼치는 순간, 무언가 잘못됐다는 걸 느꼈다.</div>
+      <button id="intro-btn">일기장을 펼친다</button>
+    </div>
+  </div>
+
+  <!-- 메인 게임 -->
+  <div id="game-screen" style="display:none">
+    <div id="bg-layer">
+      <img id="bg-img" src="assets/cover.jpg" alt="">
+      <div id="bg-overlay"></div>
+      <div id="vignette"></div>
+    </div>
+
+    <div id="page-container">
+      <div id="page-header">
+        <span id="page-date"></span>
+        <span id="page-num"></span>
+      </div>
+      <div id="page-text"></div>
+      <div id="page-choices"></div>
+    </div>
+
+    <div id="bottom-bar">
+      <div id="mood-bar">
+        <span id="mood-label">불안감</span>
+        <div id="mood-track"><div id="mood-fill"></div></div>
+      </div>
+      <div id="clue-list">
+        <span id="clue-title">단서:</span>
+        <span id="clues"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 점프스케어 레이어 -->
+  <div id="scare-layer" style="display:none">
+    <img id="scare-img" src="" alt="">
+    <div id="scare-text"></div>
+  </div>
+
+  <!-- 엔딩 -->
+  <div id="ending-screen" style="display:none">
+    <div id="ending-inner">
+      <div id="ending-tag"></div>
+      <div id="ending-title"></div>
+      <div id="ending-body"></div>
+      <button id="ending-btn">다시 읽는다</button>
+    </div>
+  </div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>병원 CCTV — 야간 경비</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <div id="header">
+    <span id="time-display">오전 00:00</span>
+    <span id="location-display">📍 로비</span>
+    <span id="status-display">🟢 정상</span>
+    <span id="battery">🔋 배터리: 100%</span>
+  </div>
+
+  <div id="cctv-grid">
+    <div class="cam-slot active" id="cam-main">
+      <img id="cam-img" src="assets/lobby.jpg" alt="CCTV">
+      <div id="cam-overlay"></div>
+      <div id="cam-label">CAM 01 — 로비</div>
+      <div id="cam-noise"></div>
+      <div id="anomaly-marker" style="display:none">⚠</div>
+    </div>
+    <div id="cam-sidebar">
+      <div class="cam-thumb" data-cam="0">
+        <img src="assets/lobby.jpg">
+        <span>CAM 01</span>
+        <div class="thumb-status" id="ts0">●</div>
+      </div>
+      <div class="cam-thumb" data-cam="1">
+        <img src="assets/corridor.jpg">
+        <span>CAM 02</span>
+        <div class="thumb-status" id="ts1">●</div>
+      </div>
+      <div class="cam-thumb" data-cam="2">
+        <img src="assets/ward.jpg">
+        <span>CAM 03</span>
+        <div class="thumb-status" id="ts2">●</div>
+      </div>
+      <div class="cam-thumb" data-cam="3">
+        <img src="assets/stairs.jpg">
+        <span>CAM 04</span>
+        <div class="thumb-status" id="ts3">●</div>
+      </div>
+      <div class="cam-thumb" data-cam="4">
+        <img src="assets/basement.jpg">
+        <span>CAM 05</span>
+        <div class="thumb-status" id="ts4">●</div>
+      </div>
+      <div class="cam-thumb" data-cam="5">
+        <img src="assets/rooftop.jpg">
+        <span>CAM 06</span>
+        <div class="thumb-status" id="ts5">●</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="log-panel">
+    <div id="log-wrap"></div>
+  </div>
+
+  <div id="action-panel">
+    <div id="action-buttons"></div>
+  </div>
+
+  <div id="phone-overlay" style="display:none">
+    <div id="phone-box">
+      <div id="phone-header">📞 내선 전화</div>
+      <div id="phone-text"></div>
+      <div id="phone-buttons"></div>
+    </div>
+  </div>
+
+  <div id="report-overlay" style="display:none">
+    <div id="report-box">
+      <div id="report-title">📋 이상 신고</div>
+      <div id="report-text"></div>
+      <button id="report-close">확인</button>
+    </div>
+  </div>
+
+  <div id="ending-overlay" style="display:none">
+    <div id="ending-box">
+      <div id="ending-title"></div>
+      <div id="ending-text"></div>
+      <button id="ending-restart">다시 시작</button>
+    </div>
+  </div>
+</div>
+<script src="game.js"></script>
+</body>
+</html>
