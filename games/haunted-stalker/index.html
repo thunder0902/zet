@@ -35,6 +35,20 @@
     </div>
   </div>
 
-  <script type="module" src="scene.js"></script>
+  <!-- three.js UMD fallback for browsers without ESM support -->
+  <script>
+    (function(){
+      const tryModule = () => {
+        // prefer module import when supported
+        try {
+          return false; // we'll use module scene.js which handles module import fallback
+        } catch(e){ return false; }
+      };
+    })();
+  </script>
+  <script src="https://unpkg.com/three@0.154.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/three@0.154.0/examples/js/controls/PointerLockControls.js"></script>
+
+  <script src="scene.js"></script>
 </body>
 </html>
