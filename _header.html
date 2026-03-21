@@ -57,5 +57,10 @@
     if(window.innerWidth>720){ close(); }
   }
   window.addEventListener('resize', update);
+  // open nav automatically if URL contains ?open_nav=1 (debugging/mobile capture aid)
+  try{
+    const params = new URLSearchParams(window.location.search);
+    if(params.get('open_nav')==='1') open();
+  }catch(e){/* ignore */}
 })();
 </script>
