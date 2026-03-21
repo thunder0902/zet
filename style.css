@@ -1,11 +1,11 @@
 :root{
-  --bg:#060814;
-  --surface:#0b1220;
-  --accent:#4fb0ff;
-  --muted:#9ab7d6;
-  --brand:#e7f2ff;
-  --hero-grad: linear-gradient(180deg,#060814 0%, #071026 60%);
-  --sans: 'Inter', 'Noto Sans KR', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  --bg:#fffaf6;
+  --surface:#fff5ee;
+  --accent:#ff8ab6;
+  --muted:#bda4c7;
+  --brand:#2b2b2b;
+  --hero-grad: linear-gradient(180deg,#fff8f2 0%, #fff5ee 60%);
+  --sans: 'Poppins', 'Noto Sans KR', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
 }
 *{box-sizing:border-box}
 html,body{height:100%}
