@@ -20,7 +20,7 @@ body{margin:0;font-family:var(--sans);background:var(--bg);color:var(--brand);-w
 .button{background:var(--accent);color:#042033;padding:12px 16px;border-radius:12px;text-decoration:none;font-weight:700}
 .button.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--brand)}
 /* hero visual plane (edge-to-edge) */
-.hero-media{position:absolute;inset:0;z-index:1;opacity:.18;background-image:url('/game/psycho-prince/assets/eyewall.png');background-position:center;background-size:cover;filter:blur(2px);transform:scale(1.02)}
+.hero-media{position:absolute;inset:0;z-index:1;opacity:.18;background-image:url('/games/psycho-prince/assets/eyewall.png');background-position:center;background-size:cover;filter:blur(2px);transform:scale(1.02)}
 /* sections */
 .section{padding:48px 0}
 .section .container{padding:0 24px}
