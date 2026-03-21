@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Stalker — ZET</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    body{margin:0;background:var(--bg);color:var(--brand);font-family:var(--sans)}
+    #overlay{position:fixed;left:0;top:0;right:0;bottom:0;pointer-events:none}
+    #hud{position:fixed;left:18px;top:18px;color:#fff;z-index:20}
+    #msg{position:fixed;left:50%;top:12%;transform:translateX(-50%);color:#ffdfe6;background:rgba(0,0,0,0.45);padding:12px 18px;border-radius:8px;max-width:720px}
+    .btn{pointer-events:auto;display:inline-block;margin-top:8px;padding:8px 12px;border-radius:8px;background:#ff6b9f;color:#fff;text-decoration:none}
+    #tip{position:fixed;left:50%;bottom:6%;transform:translateX(-50%);color:#ddd;background:rgba(0,0,0,0.35);padding:8px 12px;border-radius:6px}
+    canvas{display:block}
+  </style>
+</head>
+<body>
+  <!-- include: _header.html -->
+  <div id="hud">전지적 관찰자: <span id="time">00:00</span></div>
+  <div id="msg"><strong>Stalker</strong><div>당신은 숲의 폐허에서 깨어난다. 아무런 기억도, 이유도 없다. 뒤에서 무언가 당신을 보고 있다.</div><a id="startBtn" class="btn">Play (포인터락)</a></div>
+  <div id="tip">W/A/S/D 이동 • 마우스 회전 • E 상호작용 • F 손전등</div>
+  <div id="overlay"></div>
+
+  <script type="module" src="scene.js"></script>
+</body>
+</html>
