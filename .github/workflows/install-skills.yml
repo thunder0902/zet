@@ -1,0 +1,36 @@
+name: Run install-skills
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches:
+      - main
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Make script executable
+        run: |
+          chmod +x ./install-skills.sh || true
+
+      - name: Run install-skills.sh (non-interactive)
+        env:
+          CI: true
+        run: |
+          set -euo pipefail
+          bash ./install-skills.sh 2>&1 | tee skills-install.log || true
+
+      - name: Upload install log
+        uses: actions/upload-artifact@v4
+        with:
+          name: skills-install-log
+          path: skills-install.log
