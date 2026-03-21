@@ -7,7 +7,62 @@
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <!-- include: _header.html -->
+  <header class="site-header" id="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="/">ZET</a>
+    <nav class="nav" id="site-nav">
+      <a href="/">Home</a>
+      <a href="/games/">Games</a>
+    </nav>
+    <button class="nav-toggle" id="nav-toggle" aria-label="메뉴" aria-expanded="false">☰</button>
+  </div>
+  <!-- mobile overlay nav -->
+  <div id="mobile-overlay" aria-hidden="true" class="mobile-overlay">
+    <div class="mobile-inner">
+      <button id="mobile-close" class="mobile-close" aria-label="닫기">✕</button>
+      <nav class="mobile-nav">
+        <a href="/">Home</a>
+        <a href="/games/">Games</a>
+        <a href="/records/">기록</a>
+      </nav>
+    </div>
+  </div>
+</header>
+<script>
+// accessible nav toggle + overlay with animation
+(function(){
+  const btn = document.getElementById('nav-toggle');
+  const header = document.getElementById('site-header');
+  const overlay = document.getElementById('mobile-overlay');
+  const closeBtn = document.getElementById('mobile-close');
+  if(!btn||!overlay||!closeBtn||!header) return;
+
+  function open(){
+    header.classList.add('nav-open');
+    overlay.setAttribute('aria-hidden','false');
+    overlay.classList.add('open');
+    btn.setAttribute('aria-expanded','true');
+    document.body.style.overflow='hidden';
+  }
+  function close(){
+    header.classList.remove('nav-open');
+    overlay.classList.remove('open');
+    overlay.setAttribute('aria-hidden','true');
+    btn.setAttribute('aria-expanded','false');
+    document.body.style.overflow='';
+  }
+  btn.addEventListener('click', ()=>{
+    if(overlay.classList.contains('open')) close(); else open();
+  });
+  closeBtn.addEventListener('click', close);
+  // close on resize to desktop
+  function update(){
+    if(window.innerWidth>720){ close(); }
+  }
+  window.addEventListener('resize', update);
+})();
+</script>
+
 
   <main class="container" style="padding-top:28px">
     <h1 style="margin-top:0">게임 목록</h1>
