@@ -2,17 +2,22 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Stalker — ZET</title>
   <link rel="stylesheet" href="/style.css">
   <style>
-    body{margin:0;background:var(--bg);color:var(--brand);font-family:var(--sans)}
+    body{margin:0;background:var(--bg);color:var(--brand);font-family:var(--sans);overflow:hidden}
     #overlay{position:fixed;left:0;top:0;right:0;bottom:0;pointer-events:none}
     #hud{position:fixed;left:18px;top:18px;color:#fff;z-index:20}
-    #msg{position:fixed;left:50%;top:12%;transform:translateX(-50%);color:#ffdfe6;background:rgba(0,0,0,0.45);padding:12px 18px;border-radius:8px;max-width:720px}
+    #msg{position:fixed;left:50%;top:12%;transform:translateX(-50%);color:#ffdfe6;background:rgba(0,0,0,0.45);padding:12px 18px;border-radius:8px;max-width:720px;z-index:30}
     .btn{pointer-events:auto;display:inline-block;margin-top:8px;padding:8px 12px;border-radius:8px;background:#ff6b9f;color:#fff;text-decoration:none}
-    #tip{position:fixed;left:50%;bottom:6%;transform:translateX(-50%);color:#ddd;background:rgba(0,0,0,0.35);padding:8px 12px;border-radius:6px}
+    #tip{position:fixed;left:50%;bottom:6%;transform:translateX(-50%);color:#ddd;background:rgba(0,0,0,0.35);padding:8px 12px;border-radius:6px;z-index:30}
     canvas{display:block}
+    /* mobile controls */
+    .touch-controls{position:fixed;left:0;right:0;bottom:0;height:120px;pointer-events:none;z-index:40}
+    .stick-area{position:absolute;left:12px;bottom:12px;width:140px;height:120px;pointer-events:auto}
+    .button-area{position:absolute;right:12px;bottom:12px;pointer-events:auto;display:flex;gap:8px}
+    .touch-btn{width:56px;height:56px;border-radius:12px;background:rgba(0,0,0,0.5);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
   </style>
 </head>
 <body>
@@ -21,6 +26,14 @@
   <div id="msg"><strong>Stalker</strong><div>당신은 숲의 폐허에서 깨어난다. 아무런 기억도, 이유도 없다. 뒤에서 무언가 당신을 보고 있다.</div><a id="startBtn" class="btn">Play (포인터락)</a></div>
   <div id="tip">W/A/S/D 이동 • 마우스 회전 • E 상호작용 • F 손전등</div>
   <div id="overlay"></div>
+
+  <div class="touch-controls" id="touchControls" style="display:none">
+    <div class="stick-area" id="stickArea"></div>
+    <div class="button-area">
+      <div class="touch-btn" id="btnFlash">F</div>
+      <div class="touch-btn" id="btnInteract">E</div>
+    </div>
+  </div>
 
   <script type="module" src="scene.js"></script>
 </body>
