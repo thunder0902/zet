@@ -7,38 +7,39 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- site header -->
+  <!-- header include -->
   <!-- include: _header.html -->
-  <header class="site-header">
-  <div class="container header-inner">
-    <a class="brand" href="/">ZET</a>
-    <nav class="nav">
-      <a href="/">Home</a>
-      <a href="/games/">Games</a>
-      <a href="https://github.com/thunder0902/zet" target="_blank" rel="noopener">GitHub</a>
-    </nav>
-    <button class="nav-toggle" aria-label="메뉴">☰</button>
-  </div>
-</header>
 
-  <header class="site-head">
-    <div class="container">
-      <h1>ZET</h1>
-      <p class="tagline">윤코형님 게임 포털 — 공포 게임과 실험작 모음</p>
-      <nav><a class="cta" href="/games/">게임 보러가기</a></nav>
+  <!-- Full-bleed hero -->
+  <section class="site-hero">
+    <div class="hero-media" aria-hidden="true"></div>
+    <div class="hero-inner container">
+      <div>
+        <div class="brand" style="font-size:14px;opacity:.9">ZET</div>
+        <h1 class="hero-title">윤코형님의 공포 게임 모음</h1>
+        <p class="hero-sub">작고 어두운 실험작부터 완성형 호러까지 — 브라우저에서 바로 플레이하거나 다운로드하세요.</p>
+      </div>
+      <div class="hero-cta">
+        <a class="button" href="/games/">게임 보러가기</a>
+        <a class="button secondary" href="https://github.com/thunder0902/zet" target="_blank">GitHub</a>
+      </div>
     </div>
-  </header>
-  <main class="hero">
-    <div class="container">
-      <h2>요약</h2>
-      <p>여기는 윤코형님이 만든 게임들을 모아놓은 공간입니다. 간단한 웹 기반 플레이와 다운로드를 지원합니다.</p>
-      <section class="features">
-        <div class="feature"><h3>빠른 접근</h3><p>게임 목록은 <a href="/games/">/games</a> 에서 확인하세요.</p></div>
-        <div class="feature"><h3>배포 자동화</h3><p>GitHub Pages로 자동 배포됩니다.</p></div>
-        <div class="feature"><h3>피드백 환영</h3><p>버그/개선 사항은 이 리포에 이슈로 올려주세요.</p></div>
-      </section>
-    </div>
+  </section>
+
+  <main>
+    <section class="section">
+      <div class="container">
+        <h2 style="margin-top:0">빠른 안내</h2>
+        <p class="hero-sub">첫 화면은 브랜드와 핵심 메시지, 한 개의 CTA, 그리고 한 개의 시각적 배경으로 구성됩니다. 아래 목록에서 게임을 골라 플레이하세요.</p>
+        <div class="features" style="margin-top:18px">
+          <div class="feature"><h3>빠른 접근</h3><p>게임 목록은 <a href="/games/">/games</a> 에서 확인하세요.</p></div>
+          <div class="feature"><h3>배포 자동화</h3><p>GitHub Pages로 자동 배포됩니다.</p></div>
+          <div class="feature"><h3>피드백 환영</h3><p>버그/개선 사항은 이 리포에 이슈로 올려주세요.</p></div>
+        </div>
+      </div>
+    </section>
   </main>
+
   <footer class="site-foot">
     <div class="container">© 2026 윤코형님 — dhole.digital</div>
   </footer>
