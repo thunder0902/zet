@@ -1,10 +1,11 @@
 :root{
-  --bg:#fffaf6;
-  --surface:#fff5ee;
-  --accent:#ff8ab6;
-  --muted:#bda4c7;
-  --brand:#2b2b2b;
-  --hero-grad: linear-gradient(180deg,#fff8f2 0%, #fff5ee 60%);
+  --bg: #fffefc;
+  --surface: #fff7fb;
+  --accent: #ff66b3; /* pink */
+  --accent-2: #7ad7ff; /* sky */
+  --muted: #e6d4e9;
+  --brand: #1f2a44;
+  --hero-grad: linear-gradient(180deg,#fff7fb 0%, #fff2f8 60%);
   --sans: 'Poppins', 'Noto Sans KR', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
 }
 *{box-sizing:border-box}
@@ -12,13 +13,13 @@ html,body{height:100%}
 body{margin:0;font-family:var(--sans);background:var(--bg);color:var(--brand);-webkit-font-smoothing:antialiased}
 .container{max-width:1100px;margin:0 auto;padding:24px}
 /* HERO full-bleed */
-.site-hero{min-height:60vh;display:grid;align-items:center;position:relative;overflow:hidden;background:var(--hero-grad)}
+.site-hero{min-height:60vh;display:grid;align-items:center;position:relative;overflow:hidden;background:var(--hero-grad);border-bottom-left-radius:18px;border-bottom-right-radius:18px}
 .hero-inner{display:flex;flex-direction:column;gap:18px;padding:48px 24px;z-index:3}
-.hero-title{font-size:clamp(28px,6vw,56px);line-height:1.02;margin:0;font-weight:800;letter-spacing:-0.02em}
-.hero-sub{color:var(--muted);font-size:clamp(14px,2.4vw,18px);max-width:720px}
+.hero-title{font-size:clamp(28px,6vw,56px);line-height:1.02;margin:0;font-weight:800;letter-spacing:-0.02em;font-family:'Poppins',sans-serif;color:var(--brand)}
+.hero-sub{color:#6b6b7a;font-size:clamp(14px,2.4vw,18px);max-width:720px}
 .hero-cta{margin-top:12px;display:flex;gap:12px}
-.button{background:var(--accent);color:#042033;padding:12px 16px;border-radius:12px;text-decoration:none;font-weight:700}
-.button.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--brand)}
+.button{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;padding:12px 20px;border-radius:999px;text-decoration:none;font-weight:700;box-shadow:0 8px 24px rgba(255,102,179,0.12)}
+.button.secondary{background:transparent;border:1px solid rgba(31,42,68,0.06);color:var(--brand)}
 /* hero visual plane (edge-to-edge) */
 .hero-media{position:absolute;inset:0;z-index:1;opacity:.18;background-image:url('/games/psycho-prince/assets/eyewall.png');background-position:center;background-size:cover;filter:blur(2px);transform:scale(1.02)}
 /* sections */
@@ -27,15 +28,15 @@ body{margin:0;font-family:var(--sans);background:var(--bg);color:var(--brand);-w
 .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
 .feature{background:transparent;padding:18px;border-radius:12px}
 /* header */
-.site-header{position:sticky;top:0;z-index:60;background:linear-gradient(180deg,rgba(7,16,38,0.6),transparent);backdrop-filter:blur(6px)}
-.header-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 24px}
+.site-header{position:sticky;top:14px;z-index:60;background:linear-gradient(180deg,rgba(255,255,255,0.85),transparent);backdrop-filter:blur(6px);margin:8px}
+.header-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 24px;border-radius:14px}
 .brand{font-weight:900;font-size:18px;color:var(--brand);text-decoration:none}
 .nav{display:flex;gap:12px;align-items:center}
 .nav a{color:var(--muted);text-decoration:none;padding:8px;border-radius:8px}
 .nav a:hover{color:var(--accent)}
 .nav-toggle{display:none}
 /* footer */
-.site-foot{border-top:1px solid rgba(255,255,255,0.03);padding:18px 0;margin-top:36px;text-align:center;color:var(--muted)}
+.site-foot{border-top:1px solid rgba(31,42,68,0.03);padding:18px 0;margin-top:36px;text-align:center;color:var(--muted)}
 /* subtle motion */
 @keyframes floatUp{0%{transform:translateY(6px)}50%{transform:translateY(-6px)}100%{transform:translateY(6px)}}
 .hero-flag{animation:floatUp 6s ease-in-out infinite}
