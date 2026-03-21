@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lil Run — ZET</title>
+  <link rel="stylesheet" href="/style.css">
+  <style>
+    body{background:var(--bg);color:var(--brand);font-family:var(--sans)}
+    .game-wrap{max-width:820px;margin:20px auto;padding:18px}
+    .canvas-wrap{background:linear-gradient(180deg,#fff7fb, #fff2f8);border-radius:12px;padding:12px;display:flex;justify-content:center}
+    canvas{background:transparent;border-radius:8px}
+    .controls{margin-top:12px;display:flex;gap:8px;align-items:center}
+    .hint{color:var(--muted);font-size:13px}
+    .btn{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;padding:8px 12px;border-radius:10px;text-decoration:none}
+  </style>
+</head>
+<body>
+  <!-- include: _header.html -->
+  <main class="game-wrap container">
+    <h1 style="margin-top:0">Lil Run</h1>
+    <p class="hero-sub">간단한 점프 피하기 미니 게임 — 스페이스/터치로 점프하세요.</p>
+
+    <div class="canvas-wrap">
+      <canvas id="game" width="480" height="220" aria-label="Lil Run game canvas"></canvas>
+    </div>
+
+    <div class="controls">
+      <a id="btnPlay" class="btn">Play / Restart</a>
+      <div class="hint">점프: 스페이스 또는 화면 탭</div>
+      <div style="margin-left:auto" id="score">Score: 0</div>
+    </div>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>
