@@ -1,10 +1,10 @@
 :root{
-  --bg:#071026;
-  --surface:#071a2e;
-  --accent:#22d3ee;
-  --muted:#9fb4c9;
-  --brand:#e6f0ff;
-  --hero-grad: linear-gradient(180deg,#081027 0%, #071026 60%);
+  --bg:#060814;
+  --surface:#0b1220;
+  --accent:#4fb0ff;
+  --muted:#9ab7d6;
+  --brand:#e7f2ff;
+  --hero-grad: linear-gradient(180deg,#060814 0%, #071026 60%);
   --sans: 'Inter', 'Noto Sans KR', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
 }
 *{box-sizing:border-box}
