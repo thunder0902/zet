@@ -18,6 +18,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
   <link rel="preload" as="image" href="/games/psycho-prince/assets/eyewall.png">
+  <style>
+    /* Critical CSS - inline for LCP (header + hero basics) */
+    .brand{font-weight:900;font-size:18px;color:#1f2a44;text-decoration:none}
+    body{margin:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;background:#fffefc;color:#1f2a44}
+    .site-header{position:sticky;top:14px;z-index:60;background:linear-gradient(180deg,rgba(255,255,255,0.85),transparent);backdrop-filter:blur(6px);margin:8px}
+    .hero-media{position:absolute;inset:0;z-index:1;opacity:.18;background-image:url('/games/psycho-prince/assets/eyewall.png');background-position:center;background-size:cover;filter:blur(2px);transform:scale(1.02)}
+    .site-hero{min-height:60vh;display:grid;align-items:center;position:relative;overflow:hidden;background:linear-gradient(180deg,#fff7fb 0%, #fff2f8 60%);border-bottom-left-radius:18px;border-bottom-right-radius:18px}
+    .hero-inner{display:flex;flex-direction:column;gap:18px;padding:48px 24px;z-index:3}
+    .hero-title{font-size:clamp(28px,6vw,56px);line-height:1.02;margin:0;font-weight:800;letter-spacing:-0.02em;font-family:'Poppins',sans-serif;color:#1f2a44}
+    .hero-sub{color:#6b6b7a;font-size:clamp(14px,2.4vw,18px);max-width:720px}
+    .hero-cta{margin-top:12px;display:flex;gap:12px}
+    .button{background:linear-gradient(90deg,#ff66b3,#7ad7ff);color:white;padding:12px 20px;border-radius:999px;text-decoration:none;font-weight:700}
+  </style>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
