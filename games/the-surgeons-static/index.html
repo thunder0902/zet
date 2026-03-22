@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>The Surgeon's Static — 초현실적 심리 공포</title>
+<style>
+  :root{--bg:#0b0b0b;--fg:#eaeaea;--accent:#cfcfcf;--danger:#ff6b6b}
+  html,body{height:100%;margin:0;background:#000;color:var(--fg);font-family:Inter, Noto Sans KR, system-ui}
+  canvas{display:block;width:100vw;height:100vh;background:#000;touch-action:none}
+  .ui{
+    position:absolute;left:12px;right:12px;bottom:18px;pointer-events:none;
+    display:flex;flex-direction:column;gap:10px;z-index:20;
+  }
+  .hud{
+    display:flex;align-items:center;gap:12px;justify-content:space-between;pointer-events:auto;
+    background:linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.2));
+    padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);
+    backdrop-filter: blur(6px);
+  }
+  .stamina-wrap{flex:1;margin-right:12px;background:rgba(255,255,255,0.03);height:12px;border-radius:10px;overflow:hidden}
+  .stamina-bar{height:100%;background:linear-gradient(90deg,#ddd,#999);width:100%}
+  .label{font-size:13px;color:#cfcfcf}
+  .msg{
+    position:absolute;left:50%;top:14vh;transform:translateX(-50%);max-width:760px;
+    background:rgba(0,0,0,0.6);padding:14px 18px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);
+    font-size:15px;line-height:1.4;text-align:center;pointer-events:none;z-index:21;
+  }
+  .hint{font-size:12px;opacity:0.8;color:#a9a9a9}
+  .btn{
+    pointer-events:auto;padding:8px 12px;border-radius:10px;background:#111;border:1px solid rgba(255,255,255,0.04);color:var(--fg);cursor:pointer;
+  }
+  .corner{position:absolute;right:12px;top:12px;z-index:21;pointer-events:auto}
+  .credits{font-size:12px;opacity:0.6}
+  @media (max-width:640px){
+    .msg{font-size:13px;padding:10px}
+    .hud{padding:8px}
+  }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div class="ui" id="ui">
+  <div class="hud" id="hud">
+    <div style="display:flex;gap:12px;align-items:center">
+      <div style="min-width:120px">
+        <div class="label">눈 깜빡임 스태미나</div>
+        <div class="stamina-wrap"><div id="stamina" class="stamina-bar"></div></div>
+      </div>
+      <div style="min-width:120px">
+        <div class="label">방 시간</div>
+        <div id="roomTime" style="font-weight:700">00:00</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <div class="hint">W/A/S/D 이동 • 마우스 회전 • Space 깜빡임</div>
+    </div>
+  </div>
+</div>
+
+<div class="msg" id="msg">
+  <strong>외과 의사의 정적</strong>
+  <div style="height:8px"></div>
+  낡은 수술실. 메스가 금속을 긁는 듯한 소리와 함께 복도 끝에서 무언가 다가온다. 눈을 감지 않도록 스태미나를 관리하라. <br><br>
+  <button id="startBtn" class="btn">시작하기</button>
+</div>
+
+<div class="corner">
+  <div class="credits">The Surgeon's Static — 프로토타입</div>
+</div>
+
+<script>
+(() => {
+  // Canvas + rendering
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d', { alpha: false });
+  let W = innerWidth, H = innerHeight;
+  function resize(){ W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
+  addEventListener('resize', resize);
+  resize();
+
+  // State
+  const state = {
+    playing: false,
+    startTime: 0,
+    roomTime: 0,
+    stamina: 100, // blink stamina 0-100
+    blinkCooldown: 0,
+    blinkActive: false,
+    staticIntensity: 0, // 0-1
+    doctorDist: 60, // meters-ish
+    playerPos: { x: 0, y: 0 },
+    doctorPos: { x: 0, y: -60 },
+    roomIndex: 0,
+    rngSeed: Math.random()*1e6,
+    audioStarted: false,
+  };
+
+  // UI refs
+  const staminaEl = document.getElementById('stamina');
+  const roomTimeEl = document.getElementById('roomTime');
+  const msg = document.getElementById('msg');
+  const startBtn = document.getElementById('startBtn');
+
+  // FP utilities
+  function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+  function lerp(a,b,t){ return a + (b-a)*t; }
+  function rand(){ state.rngSeed = (state.rngSeed*9301+49297)%233280; return state.rngSeed/233280; }
+
+  // Controls
+  const keys = {};
+  addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; if(e.key===' '){ e.preventDefault(); blink(); }});
+  addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+
+  // Pointer look
+  let yaw = 0, pitch = 0;
+  let pointerDown = false;
+  canvas.addEventListener('mousedown', e => {
+    pointerDown = true; canvas.requestPointerLock?.();
+  });
+  document.addEventListener('pointerlockchange', ()=>{ if(document.pointerLockElement !== canvas) pointerDown=false; });
+  document.addEventListener('mousemove', e => {
+    if(document.pointerLockElement === canvas){
+      yaw += e.movementX * 0.0025;
+      pitch = clamp(pitch + e.movementY * 0.0025, -1.2, 1.2);
+    }
+  });
+
+  // Audio - simple Web Audio synth for heartbeat + metallic scratch + static noise
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  let audioCtx, masterGain, heartbeatGain, noiseNode, metalNode;
+  function initAudio(){
+    if(audioCtx) return;
+    audioCtx = new AudioCtx();
+    masterGain = audioCtx.createGain(); masterGain.gain.value = 0.9; masterGain.connect(audioCtx.destination);
+
+    // heartbeat - low pulse
+    const hbOsc = audioCtx.createOscillator();
+    hbOsc.type = 'sine';
+    hbOsc.frequency.value = 32;
+    heartbeatGain = audioCtx.createGain(); heartbeatGain.gain.value = 0.0;
+    hbOsc.connect(heartbeatGain); heartbeatGain.connect(masterGain);
+    hbOsc.start();
+
+    // metallic scrapes - noise through bandpass + periodic gates
+    const bufferSize = 2*audioCtx.sampleRate;
+    const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = noiseBuffer.getChannelData(0);
+    for(let i=0;i<bufferSize;i++) data[i] = (Math.random()*2-1)*0.2;
+    noiseNode = audioCtx.createBufferSource(); noiseNode.buffer = noiseBuffer; noiseNode.loop = true;
+    const bp = audioCtx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 3200; bp.Q.value = 0.6;
+    noiseNode.connect(bp);
+    metalNode = audioCtx.createGain(); metalNode.gain.value = 0;
+    bp.connect(metalNode); metalNode.connect(masterGain);
+    noiseNode.start();
+
+    // static - separate noise mixed into master but we will modulate via canvas visual, low volume
+    const staticBuf = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const sdata = staticBuf.getChannelData(0);
+    for(let i=0;i<bufferSize;i++) sdata[i] = (Math.random()*2-1)*0.06;
+    const staticNode = audioCtx.createBufferSource(); staticNode.buffer = staticBuf; staticNode.loop = true;
+    const staticGain = audioCtx.createGain(); staticGain.gain.value = 0.0; staticNode.connect(staticGain); staticGain.connect(masterGain);
+    staticNode.start();
+    // expose mod functions
+    audioMod = {
+      setHeartbeat: (v) => { heartbeatGain.gain.linearRampToValueAtTime(v*0.6, audioCtx.currentTime+0.05); hbOsc.frequency.linearRampToValueAtTime(30 + v*40, audioCtx.currentTime+0.05); },
+      setMetal: (v) => { metalNode.gain.linearRampToValueAtTime(v*0.9, audioCtx.currentTime+0.05); },
+      setStatic: (v) => { staticGain.gain.linearRampToValueAtTime(v*0.25, audioCtx.currentTime+0.05); },
+    };
+  }
+  let audioMod = { setHeartbeat:()=>{}, setMetal:()=>{}, setStatic:()=>{} };
+
+  function startAudioOnGesture(){
+    if(state.audioStarted) return;
+    try{
+      initAudio();
+      state.audioStarted = true;
+    }catch(e){ console.warn('audio init failed', e); }
+  }
+
+  // Blink mechanics
+  function blink(){
+    if(state.blinkCooldown > 0.6) return; // throttle rapid blinking
+    state.blinkActive = true;
+    // consume stamina
+    state.stamina = clamp(state.stamina - 18, 0, 100);
+    state.blinkCooldown = 1.2;
+  }
+
+  // Room logic: for prototype implement intro room with items/pieces
+  const ROOM_DURATION = 60*15; // target 15 minutes overall (we only demo first room)
+  const rooms = [
+    { id:0, name:'Intro - 수술실', desc:'깨어난다. 빛과 금속 소리, 복도에서 발소리.' },
+    { id:1, name:'회복실', desc:'냉정한 조명과 뿌연 거울.' },
+    { id:2, name:'복도', desc:'늘어나는 그림자와 문들.' },
+    { id:3, name:'기억의 방', desc:'기억 조각이 흩어져 있다.' },
+    { id:4, name:'최종실', desc:'진실과 마주하는 곳.' },
+  ];
+
+  // Visual noise generator
+  function drawStatic(intensity){
+    const imgd = ctx.createImageData(W, H);
+    const d = imgd.data;
+    const t = performance.now()*0.002;
+    const thresh = intensity * 255;
+    for(let i=0;i<d.length;i+=4){
+      // base slight gradient + noise
+      const x = ((i/4) % W), y = Math.floor((i/4)/W);
+      const n = Math.floor((Math.sin((x*0.05+t)*0.7)+Math.cos((y*0.03+t*0.5))*0.5 + rand()*0.6)*128);
+      const v = clamp(30 + n + intensity*200*(rand()-0.5), 0, 255);
+      // grayscale
+      d[i]=d[i+1]=d[i+2]=v;
+      d[i+3]=255;
+    }
+    ctx.putImageData(imgd,0,0);
+  }
+
+  // Scene draw: simple hallway + surgical table silhouette, doctor as dark silhouette off-center
+  function drawScene(dt){
+    // base gradient floor/wall
+    const g = ctx.createLinearGradient(0,0,0,H);
+    g.addColorStop(0,'#070707'); g.addColorStop(0.6,'#0b0b0b'); g.addColorStop(1,'#060606');
+    ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+
+    // vignette
+    const vign = ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*0.2,W/2,H/2,Math.max(W,H));
+    vign.addColorStop(0,'rgba(0,0,0,0)');
+    vign.addColorStop(1,'rgba(0,0,0,0.6)');
+    ctx.fillStyle = vign; ctx.fillRect(0,0,W,H);
+
+    // surgical table silhouette
+    ctx.save();
+    ctx.translate(W*0.5, H*0.55);
+    ctx.fillStyle = '#050505';
+    ctx.fillRect(-W*0.18, -12, W*0.36, 24);
+    ctx.fillRect(-W*0.05, -60, W*0.1, 48);
+    ctx.restore();
+
+    // corridor perspective lines
+    ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(W*0.5, H*0.4); ctx.lineTo(W*0.8, H*0.9);
+    ctx.moveTo(W*0.5, H*0.4); ctx.lineTo(W*0.2, H*0.9);
+    ctx.stroke();
+
+    // doctor silhouette - position based on doctorDist
+    const closeness = clamp(1 - (state.doctorDist/60), 0, 1);
+    const docX = W*0.5 + Math.sin(performance.now()*0.001 + state.roomIndex)*W*0.25*closeness;
+    const docY = H*0.15 + (1-closeness)*H*0.03;
+    const scale = lerp(0.6, 2.4, closeness);
+    ctx.save();
+    ctx.translate(docX, docY);
+    ctx.scale(scale, scale);
+    // body
+    ctx.fillStyle = `rgba(8,8,8, ${0.9})`;
+    ctx.beginPath(); ctx.ellipse(0, 40, 18, 36, 0, 0, Math.PI*2); ctx.fill();
+    // head with mask/reflect
+    ctx.beginPath(); ctx.ellipse(0, -6, 18, 18, 0, 0, Math.PI*2); ctx.fill();
+    // scalpel (reflect)
+    ctx.strokeStyle = 'rgba(200,200,200,0.65)'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(18, -2); ctx.lineTo(52, -18); ctx.stroke();
+    ctx.restore();
+
+    // noise overlay driven by staticIntensity
+    if(state.staticIntensity > 0.02){
+      ctx.save();
+      ctx.globalAlpha = clamp(state.staticIntensity*0.9, 0, 0.9);
+      // scanline noise
+      ctx.fillStyle = `rgba(255,255,255,${0.02 + 0.08*state.staticIntensity})`;
+      for(let i=0;i<20;i++){
+        ctx.fillRect(0, (i*(H/20) + (performance.now()*0.05)%6), W, 1);
+      }
+      ctx.restore();
+    }
+  }
+
+  // UI update
+  function updateUI(){
+    staminaEl.style.width = state.stamina + '%';
+    const rt = Math.floor(state.roomTime);
+    const mm = String(Math.floor(rt/60)).padStart(2,'0');
+    const ss = String(rt%60).padStart(2,'0');
+    roomTimeEl.textContent = `${mm}:${ss}`;
+  }
+
+  // Gameplay rules - doctor approach when player blinks or on timer
+  function gameplayStep(dt){
+    // movement
+    const speed = 60 * (dt/1000); // units per second
+    let mv = {x:0,y:0};
+    if(keys['w']) mv.y -= 1;
+    if(keys['s']) mv.y += 1;
+    if(keys['a']) mv.x -= 1;
+    if(keys['d']) mv.x += 1;
+    if(mv.x || mv.y){
+      const len = Math.hypot(mv.x,mv.y)||1;
+      state.playerPos.x += (mv.x/len)*speed;
+      state.playerPos.y += (mv.y/len)*speed;
+    }
+
+    // blinking consequences
+    if(state.blinkActive){
+      // short blackout for 0.5s simulated by overlay control
+      // during blackout, doctor may teleport closer or environment shifts
+      // probabilistic approach:
+      if(rand() < 0.6){
+        // doctor snaps closer
+        state.doctorDist = clamp(state.doctorDist - (6 + rand()*18), 1, 120);
+      } else {
+        // environment shift: doctor becomes slightly closer anyway
+        state.doctorDist = clamp(state.doctorDist - (3 + rand()*8), 1, 120);
+      }
+      // static intensity spike
+      state.staticIntensity = clamp(state.staticIntensity + 0.35 + rand()*0.15, 0, 1);
+      state.blinkActive = false;
+    }
+
+    // natural approach over time
+    state.doctorDist = clamp(state.doctorDist - dt*0.002 - (state.staticIntensity*0.002), 0.5, 200);
+
+    // stamina regen
+    if(state.blinkCooldown > 0) state.blinkCooldown = clamp(state.blinkCooldown - dt/1000, 0, 10);
+    if(state.stamina < 100 && state.blinkCooldown === 0){
+      state.stamina = clamp(state.stamina + dt*0.008, 0, 100);
+    }
+
+    // static intensity decays but increases when doctor is closer
+    const closeness = clamp(1 - (state.doctorDist/60), 0, 1);
+    state.staticIntensity = clamp(lerp(state.staticIntensity, closeness, dt*0.003) , 0, 1);
+
+    // audio mod
+    audioMod.setHeartbeat(closeness);
+    audioMod.setMetal(state.staticIntensity*0.9);
+    audioMod.setStatic(state.staticIntensity*0.6);
+
+    // time
+    state.roomTime += dt/1000;
+    // random ambient tics
+    if(rand() < dt*0.00006 + state.staticIntensity*0.0005){
+      // small jump in static
+      state.staticIntensity = clamp(state.staticIntensity + 0.08 + rand()*0.12, 0, 1);
+    }
+    // if doctor extremely close -> game over or escalate
+    if(state.doctorDist < 1.2){
+      triggerGameOver();
+    }
+  }
+
+  // Visual blackout overlay controller (for blink effect)
+  let blackoutTimer = 0;
+  function render(dt){
+    // if blackout: fill black for fraction
+    if(blackoutTimer > 0){
+      ctx.fillStyle = 'black'; ctx.fillRect(0,0,W,H);
+      blackoutTimer = clamp(blackoutTimer - dt/1000, 0, 5);
+      // faint audio ramp
+      audioMod.setStatic(1.0);
+      return;
+    }
+
+    // normal scene draw
+    drawScene(dt);
+
+    // draw textual noise / glitched text when staticIntensity high
+    ctx.save();
+    ctx.fillStyle = `rgba(230,230,230, ${0.85 + state.staticIntensity*0.1})`;
+    ctx.textAlign = 'center';
+    const baseText = (state.roomIndex === 0) ? '복도에서 발자국 소리...' : rooms[state.roomIndex].desc;
+    let jitter = Math.floor(state.staticIntensity*20);
+    for(let i=0;i<3;i++){
+      const xj = (rand()-0.5)*jitter*6;
+      const yj = (rand()-0.5)*jitter*2;
+      ctx.font = `${24 + Math.floor(state.staticIntensity*8)}px serif`;
+      ctx.fillText(glitchText(baseText, state.staticIntensity), W/2 + xj, H*0.28 + yj);
+    }
+    ctx.restore();
+
+    // subtle vignettes/scanlines handled in drawScene
+  }
+
+  function glitchText(t, intensity){
+    if(intensity < 0.12) return t;
+    const arr = t.split('');
+    const n = Math.floor(intensity * 6);
+    for(let i=0;i<n;i++){
+      const idx = Math.floor(rand()*arr.length);
+      arr[idx] = String.fromCharCode(0x2500 + Math.floor(rand()*80));
+    }
+    return arr.join('');
+  }
+
+  // Game over
+  let gameOverFlag = false;
+  function triggerGameOver(){
+    if(gameOverFlag) return;
+    gameOverFlag = true;
+    // heavy static + gore text (restrain graphic gore; keep psychological)
+    msg.style.display = 'block';
+    msg.innerHTML = '<strong>발견됨</strong><div style="height:10px"></div><div>그가 당신의 기억을 삼켰다. 다시 시도하려면 새 게임을 시작하세요.</div><div style="height:12px"></div><button id="retry" class="btn">다시</button>';
+    document.getElementById('retry').addEventListener('click', () => location.reload());
+    // audio escalation
+    audioMod.setHeartbeat(1.0); audioMod.setMetal(1.0); audioMod.setStatic(1.0);
+  }
+
+  // Main loop
+  let last = performance.now();
+  function loop(t){
+    const dt = t - last; last = t;
+    if(state.playing){
+      gameplayStep(dt);
+    }
+    // if blink stamina depleted, cause forced blackout
+    if(state.stamina <= 0 && !gameOverFlag){
+      // forced blink
+      blackoutTimer = 0.5;
+      // heavy penalty
+      state.doctorDist = clamp(state.doctorDist - (8 + rand()*30), 0.2, 200);
+      state.stamina = 8; // small regen start
+    }
+    render(dt);
+    updateUI();
+    // draw static overlay if intensity > 0
+    if(state.staticIntensity > 0.03 && blackoutTimer <= 0){
+      // draw pixel noise overlay by direct pixel manipulation (cheaper: semi-alpha rectangles)
+      ctx.save();
+      ctx.globalAlpha = clamp(state.staticIntensity*0.9, 0, 0.9);
+      const count = Math.floor(200 * state.staticIntensity);
+      for(let i=0;i<count;i++){
+        ctx.fillStyle = `rgba(${80+Math.floor(rand()*80)},${80+Math.floor(rand()*80)},${80+Math.floor(rand()*80)},${0.03 + rand()*0.06})`;
+        ctx.fillRect(Math.floor(rand()*W), Math.floor(rand()*H), Math.ceil(rand()*3), Math.ceil(rand()*3));
+      }
+      ctx.restore();
+    }
+    requestAnimationFrame(loop);
+  }
+
+  // Start game
+  function start(){
+    startAudioOnGesture();
+    state.playing = true;
+    state.startTime = performance.now();
+    state.roomTime = 0;
+    msg.style.display = 'none';
+    // small intro: doctor footsteps approach slightly
+    state.doctorDist = 38 + rand()*18;
+    requestAnimationFrame(loop);
+  }
+  startBtn.addEventListener('click', start);
+
+  // Expose music/ambient triggers for subtle tension
+  setInterval(()=>{
+    // heartbeat tick pulses a little even when far
+    const closeness = clamp(1 - (state.doctorDist/60), 0, 1);
+    audioMod.setHeartbeat(0.15 + closeness*0.5);
+  }, 800);
+
+  // auto-save pieces / intro interactions (demo: find memory shard in room)
+  const pieces = [{x:12,y:5,found:false}];
+  function checkPieces(){
+    // simplistic: if near center and time > 3s
+    if(!pieces[0].found && state.roomTime > 3 && Math.abs(state.playerPos.x) < 24){
+      pieces[0].found = true;
+      showTransient('기억의 조각을 발견했다...', 2800);
+      // reward/regress
+      state.stamina = clamp(state.stamina + 22, 0, 100);
+      // small effect: doctor recoils a bit
+      state.doctorDist = clamp(state.doctorDist + 10, 0.2, 200);
+    }
+  }
+
+  function showTransient(text, time=2000){
+    const el = document.createElement('div'); el.style.position='fixed'; el.style.left='50%'; el.style.top='20%';
+    el.style.transform='translateX(-50%)'; el.style.background='rgba(10,10,10,0.7)'; el.style.color='#fff';
+    el.style.padding='10px 14px'; el.style.borderRadius='8px'; el.style.zIndex=40; el.style.fontSize='14px';
+    el.textContent = text; document.body.appendChild(el);
+    setTimeout(()=>{ el.style.transition='opacity 0.5s'; el.style.opacity=0; setTimeout(()=>el.remove(),600); }, time);
+  }
+
+  // small loop for piece check
+  setInterval(()=>{ if(state.playing) checkPieces(); }, 800);
+
+  // initial draw
+  ctx.fillStyle = '#000'; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle = '#f0f0f0'; ctx.textAlign='center'; ctx.font='18px sans-serif';
+  ctx.fillText('The Surgeon\'s Static — 준비되면 시작을 누르세요', W/2, H/2);
+
+  // Prevent accidental gestures from scrolling on mobile
+  document.body.addEventListener('touchmove', e => { if(state.playing) e.preventDefault(); }, { passive:false });
+
+  // For accessibility: start audio on any user gesture
+  ['click','touchstart','keydown','pointerdown'].forEach(ev=>{
+    window.addEventListener(ev, () => startAudioOnGesture(), { once:true });
+  });
+
+  // make sure to step audio modulation even before audio started (no-op)
+  setInterval(()=>{},1000);
+
+  // Expose some dev keys (for testing)
+  window.__theSurgeon = {
+    state, stun: ()=>{state.doctorDist += 30;}, kill: ()=>triggerGameOver()
+  };
+
+  // small heartbeat to escalate static if user keeps staring (no blink)
+  setInterval(()=>{
+    if(!state.playing) return;
+    if(state.stamina > 66 && rand() < 0.008) {
+      // small involuntary blink chance to add unpredictability
+      blink();
+    }
+  }, 2000);
+
+})();
+</script>
+</body>
+</html>
