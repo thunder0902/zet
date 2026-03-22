@@ -1,12 +1,12 @@
 <header class="site-header" id="site-header">
   <div class="container header-inner">
     <a class="brand" href="/">ZET</a>
-    <nav class="nav" id="site-nav">
+    <nav class="nav" id="site-nav" aria-label="주요 네비게이션">
       <a href="/">Home</a>
       <a href="/games/">Games</a>
     </nav>
-    <button class="nav-toggle" id="nav-toggle" aria-label="메뉴" aria-expanded="false">
-      <span class="burger">
+    <button class="nav-toggle" id="nav-toggle" aria-label="메뉴" aria-expanded="false" aria-controls="mobile-overlay" aria-haspopup="true">
+      <span class="burger" aria-hidden="true">
         <span class="bar bar1"></span>
         <span class="bar bar2"></span>
         <span class="bar bar3"></span>
@@ -14,10 +14,10 @@
     </button>
   </div>
   <!-- mobile overlay nav -->
-  <div id="mobile-overlay" aria-hidden="true" class="mobile-overlay">
+  <div id="mobile-overlay" aria-hidden="true" class="mobile-overlay" role="dialog" aria-modal="true" aria-label="모바일 네비게이션 오버레이">
     <div class="mobile-inner">
       <button id="mobile-close" class="mobile-close" aria-label="닫기">✕</button>
-      <nav class="mobile-nav">
+      <nav class="mobile-nav" id="mobile-nav-links">
         <a href="/">Home</a>
         <a href="/games/">Games</a>
         <a href="/records/">기록</a>
@@ -26,13 +26,26 @@
   </div>
 </header>
 <script>
-// accessible nav toggle + overlay with animation
+// accessible nav toggle + overlay with animation + focus trap
 (function(){
   const btn = document.getElementById('nav-toggle');
   const header = document.getElementById('site-header');
   const overlay = document.getElementById('mobile-overlay');
   const closeBtn = document.getElementById('mobile-close');
+  const firstLink = document.querySelector('#mobile-nav-links a');
   if(!btn||!overlay||!closeBtn||!header) return;
+
+  function trapFocus(e){
+    const focusable = overlay.querySelectorAll('a,button');
+    if(focusable.length===0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length-1];
+    if(e.key==='Tab'){
+      if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+      else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); }
+    }
+    if(e.key==='Escape'){ close(); }
+  }
 
   function open(){
     header.classList.add('nav-open');
@@ -40,6 +53,8 @@
     overlay.classList.add('open');
     btn.setAttribute('aria-expanded','true');
     document.body.style.overflow='hidden';
+    // focus
+    setTimeout(()=>{ try{ firstLink && firstLink.focus(); document.addEventListener('keydown', trapFocus); }catch(e){} },120);
   }
   function close(){
     header.classList.remove('nav-open');
@@ -47,20 +62,14 @@
     overlay.setAttribute('aria-hidden','true');
     btn.setAttribute('aria-expanded','false');
     document.body.style.overflow='';
+    try{ document.removeEventListener('keydown', trapFocus); btn.focus(); }catch(e){}
   }
-  btn.addEventListener('click', ()=>{
-    if(overlay.classList.contains('open')) close(); else open();
-  });
+  btn.addEventListener('click', ()=>{ if(overlay.classList.contains('open')) close(); else open(); });
   closeBtn.addEventListener('click', close);
   // close on resize to desktop
-  function update(){
-    if(window.innerWidth>720){ close(); }
-  }
+  function update(){ if(window.innerWidth>720){ close(); } }
   window.addEventListener('resize', update);
   // open nav automatically if URL contains ?open_nav=1 (debugging/mobile capture aid)
-  try{
-    const params = new URLSearchParams(window.location.search);
-    if(params.get('open_nav')==='1') open();
-  }catch(e){/* ignore */}
+  try{ const params = new URLSearchParams(window.location.search); if(params.get('open_nav')==='1') open(); }catch(e){}
 })();
 </script>
