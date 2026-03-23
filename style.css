@@ -81,3 +81,11 @@ body{margin:0;font-family:var(--sans);background:var(--bg);color:var(--brand);-w
   .site-hero{min-height:54vh}
 }
 @media(max-width:420px){.hero-title{font-size:26px}.hero-sub{font-size:14px}}
+
+/* Card styles for games list */
+.card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));border-radius:12px;padding:12px;border:1px solid rgba(31,42,68,0.04);display:block}
+.card img{border-radius:10px;display:block;width:100%;height:96px;object-fit:cover}
+.card h3{margin:0 0 6px 0}
+.card p{margin:0;color:var(--brand);opacity:.8}
+.card .meta{font-size:13px;color:var(--muted);margin:6px 0}
+
