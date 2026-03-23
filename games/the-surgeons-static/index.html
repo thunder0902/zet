@@ -5,44 +5,51 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>The Surgeon's Static — 초현실적 심리 공포</title>
 <style>
-  :root{--bg:#0b0b0b;--fg:#eaeaea;--accent:#cfcfcf;--danger:#ff6b6b}
+  :root{--bg:#080808;--fg:#efeef0;--accent:#cfcfcf;--hint:#bdbdbd}
   html,body{height:100%;margin:0;background:#000;color:var(--fg);font-family:Inter, Noto Sans KR, system-ui}
   canvas{display:block;width:100vw;height:100vh;background:#000;touch-action:none}
-  .ui{position:absolute;left:12px;right:12px;bottom:18px;pointer-events:none;display:flex;flex-direction:column;gap:10px;z-index:20}
+  .ui{position:absolute;left:12px;right:12px;bottom:18px;pointer-events:none;display:flex;flex-direction:column;gap:10px;z-index:40}
   .hud{display:flex;align-items:center;gap:12px;justify-content:space-between;pointer-events:auto;background:linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.2));padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);backdrop-filter: blur(6px)}
   .stamina-wrap{flex:1;margin-right:12px;background:rgba(255,255,255,0.03);height:12px;border-radius:10px;overflow:hidden}
-  .stamina-bar{height:100%;background:linear-gradient(90deg,#ddd,#999);width:100%}
-  .label{font-size:13px;color:#cfcfcf}
-  .msg{position:absolute;left:50%;top:14vh;transform:translateX(-50%);max-width:760px;background:rgba(0,0,0,0.6);padding:14px 18px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);font-size:15px;line-height:1.4;text-align:center;pointer-events:none;z-index:21}
-  .hint{font-size:12px;opacity:0.8;color:#a9a9a9}
+  .stamina-bar{height:100%;background:linear-gradient(90deg,#fff,#bdbdbd);width:100%}
+  .label{font-size:13px;color:var(--hint)}
+  .msg{position:absolute;left:50%;top:10vh;transform:translateX(-50%);max-width:760px;background:rgba(0,0,0,0.6);padding:14px 18px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);font-size:15px;line-height:1.4;text-align:center;pointer-events:none;z-index:41}
+  .hint{font-size:12px;opacity:0.9;color:var(--hint)}
   .btn{pointer-events:auto;padding:8px 12px;border-radius:10px;background:#111;border:1px solid rgba(255,255,255,0.04);color:var(--fg);cursor:pointer}
-  .corner{position:absolute;right:12px;top:12px;z-index:21;pointer-events:auto}
+  .corner{position:absolute;right:12px;top:12px;z-index:41;pointer-events:auto}
   .credits{font-size:12px;opacity:0.6}
-  .tutorial{position:absolute;left:50%;top:60%;transform:translateX(-50%);background:rgba(0,0,0,0.7);padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);z-index:22;pointer-events:auto}
-  @media (max-width:640px){.msg{font-size:13px;padding:10px}.hud{padding:8px}}
+  .tutorial{position:absolute;left:50%;top:58%;transform:translateX(-50%);background:rgba(0,0,0,0.7);padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);z-index:42;pointer-events:auto}
+  .top-hint{position:absolute;left:50%;transform:translateX(-50%);top:8px;background:rgba(0,0,0,0.35);padding:6px 10px;border-radius:8px;color:var(--hint);font-size:13px;z-index:42}
+  /* simple touch joystick */
+  .touch-left{position:fixed;left:12px;bottom:80px;width:120px;height:120px;border-radius:999px;background:rgba(255,255,255,0.02);z-index:39;touch-action:none}
+  .touch-right{position:fixed;right:12px;bottom:80px;width:120px;height:120px;border-radius:999px;background:rgba(255,255,255,0.02);z-index:39;display:flex;align-items:center;justify-content:center}
+  .touch-btn{pointer-events:auto;padding:10px 12px;border-radius:8px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.03);color:var(--fg)}
+  @media (max-width:640px){.msg{font-size:13px;padding:10px}.hud{padding:8px}.touch-left{width:100px;height:100px}.touch-right{width:100px;height:100px}}
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
 
+<div class="top-hint" id="topHint">목표: 기억의 조각 5개 수집 • 중앙 근처에서 상호작용(E 또는 터치)</div>
+
 <div class="ui" id="ui">
   <div class="hud" id="hud">
     <div style="display:flex;gap:12px;align-items:center">
       <div style="min-width:120px">
-        <div class="label">눈 깜빡임 스태미나</div>
+        <div class="label">눈 깜빡임</div>
         <div class="stamina-wrap"><div id="stamina" class="stamina-bar"></div></div>
       </div>
       <div style="min-width:120px">
         <div class="label">방 시간</div>
         <div id="roomTime" style="font-weight:700">00:00</div>
       </div>
-      <div style="min-width:120px">
+      <div style="min-width:120px;text-align:right">
         <div class="label">조각</div>
         <div id="shards" style="font-weight:700">0 / 5</div>
       </div>
     </div>
     <div style="display:flex;gap:8px;align-items:center">
-      <div class="hint">W/A/S/D 이동 • 마우스 회전 • Space 깜빡임</div>
+      <div class="hint">W/A/S/D 또는 화살표 이동 • E 상호작용 • Space 깜빡임</div>
     </div>
   </div>
 </div>
@@ -50,22 +57,21 @@
 <div class="msg" id="msg">
   <strong>외과 의사의 정적</strong>
   <div style="height:8px"></div>
-  낡은 수술실. 메스가 금속을 긁는 듯한 소리와 함께 복도 끝에서 무언가 다가온다. 눈을 감지 않도록 스태미나를 관리하라. <br><br>
-  목표: 기억의 조각 5개를 모아 탈출하세요.<br><br>
+  낡은 수술실. 메스 소리와 복도 발자국. 눈을 감지 않도록 스태미나를 관리하세요.<br><br>
   <button id="startBtn" class="btn">시작하기</button>
 </div>
 
 <div id="tutorial" class="tutorial" style="display:none;">
   <div style="font-weight:700;margin-bottom:6px">튜토리얼</div>
-  W/A/S/D로 이동 · Space로 깜빡임(의도적) · 중앙 근처에서 조사를 누르면 조각 획득<br>
-  조각을 모으면 스태미나가 일부 회복됩니다.
+  이동: W/A/S/D 또는 화살표 · 상호작용: E · 깜빡임: Space 또는 화면 탭(모바일)
   <div style="height:8px"></div>
   <button id="dismissTut" class="btn">알겠음</button>
 </div>
 
-<div class="corner">
-  <div class="credits">The Surgeon's Static — 프로토타입</div>
-</div>
+<div class="touch-left" id="touchLeft" style="display:none"></div>
+<div class="touch-right" id="touchRight" style="display:none"><button id="touchBlink" class="touch-btn">깜빡</button><div style="width:8px"></div><button id="touchInteract" class="touch-btn">조사</button></div>
+
+<div class="corner"><div class="credits">The Surgeon's Static — 프로토타입</div></div>
 
 <script>
 (() => {
@@ -75,7 +81,9 @@
   function resize(){ W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
   addEventListener('resize', resize); resize();
 
-  const state = { playing:false, startTime:0, roomTime:0, stamina:100, blinkCooldown:0, blinkActive:false, staticIntensity:0, doctorDist:60, playerPos:{x:0,y:0}, roomIndex:0, rngSeed:Math.random()*1e6, audioStarted:false, shards:0 };
+  // State
+  const state = { playing:false, startTime:0, roomTime:0, stamina:100, blinkCooldown:0, blinkActive:false, staticIntensity:0, doctorDist:60, playerPos:{x:0,y:0}, roomIndex:0, rngSeed:Math.random()*1e6, audioStarted:false, shards:0, tutorialShown:false, initialGrace:45 };
+
   const staminaEl = document.getElementById('stamina');
   const roomTimeEl = document.getElementById('roomTime');
   const shardsEl = document.getElementById('shards');
@@ -83,87 +91,142 @@
   const startBtn = document.getElementById('startBtn');
   const tut = document.getElementById('tutorial');
   const dismissTut = document.getElementById('dismissTut');
+  const touchLeft = document.getElementById('touchLeft');
+  const touchRight = document.getElementById('touchRight');
+  const touchBlink = document.getElementById('touchBlink');
+  const touchInteract = document.getElementById('touchInteract');
 
   function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
   function lerp(a,b,t){ return a + (b-a)*t; }
   function rand(){ state.rngSeed = (state.rngSeed*9301+49297)%233280; return state.rngSeed/233280; }
 
+  // Controls
   const keys = {};
-  addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; if(e.key===' '){ e.preventDefault(); blink(); }});
-  addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+  addEventListener('keydown', e => { const k=e.key.toLowerCase(); if(['arrowup','arrowdown','arrowleft','arrowright'].includes(k)) e.preventDefault(); keys[k]=true; if(e.key===' '){ e.preventDefault(); blink(); } if(e.key==='e' || e.key==='E') interact(); });
+  addEventListener('keyup', e=>{ keys[e.key.toLowerCase()] = false; });
 
-  canvas.addEventListener('mousedown', e => { canvas.requestPointerLock?.(); });
-  document.addEventListener('pointerlockchange', ()=>{});
-  document.addEventListener('mousemove', ()=>{});
+  // Touch controls: show on small viewports
+  function enableTouch(){ if(window.innerWidth <= 720){ touchLeft.style.display='block'; touchRight.style.display='flex'; }
+    // left: track touch drag for direction
+    let active=false, sx=0, sy=0;
+    touchLeft.addEventListener('touchstart', e=>{ e.preventDefault(); active=true; const t=e.touches[0]; sx=t.clientX; sy=t.clientY; });
+    touchLeft.addEventListener('touchmove', e=>{ e.preventDefault(); if(!active) return; const t=e.touches[0]; const dx = t.clientX - sx; const dy = t.clientY - sy; keys['w']=dy<-20; keys['s']=dy>20; keys['a']=dx<-20; keys['d']=dx>20; });
+    touchLeft.addEventListener('touchend', e=>{ active=false; keys['w']=keys['s']=keys['a']=keys['d']=false; });
+    touchBlink.addEventListener('click', ()=> blink());
+    touchInteract.addEventListener('click', ()=> interact());
+  }
+  enableTouch(); addEventListener('resize', enableTouch);
 
+  // Pointer controls fallback: allow drag to look when not pointerlocked
+  let lookX=0, lookY=0, dragging=false, lastTouchX=0, lastTouchY=0;
+  canvas.addEventListener('mousedown', e=>{ canvas.requestPointerLock?.(); dragging=true; lastTouchX=e.clientX; lastTouchY=e.clientY; });
+  document.addEventListener('mouseup', ()=>dragging=false);
+  document.addEventListener('mousemove', e=>{ if(dragging && document.pointerLockElement !== canvas){ lookX += (e.clientX - lastTouchX)*0.004; lookY += (e.clientY - lastTouchY)*0.004; lastTouchX=e.clientX; lastTouchY=e.clientY; } });
+  // mobile touch look
+  canvas.addEventListener('touchstart', e=>{ if(e.touches.length===1){ lastTouchX=e.touches[0].clientX; lastTouchY=e.touches[0].clientY; } });
+  canvas.addEventListener('touchmove', e=>{ if(e.touches.length===1 && e.targetTouches){ const t=e.touches[0]; lookX += (t.clientX - lastTouchX)*0.006; lookY += (t.clientY - lastTouchY)*0.006; lastTouchX=t.clientX; lastTouchY=t.clientY; } }, {passive:false});
+
+  // Audio
   const AudioCtx = window.AudioContext || window.webkitAudioContext;
   let audioCtx, masterGain, heartbeatGain, noiseNode, metalNode, staticGainNode;
   function initAudio(){ if(audioCtx) return; audioCtx = new AudioCtx(); masterGain = audioCtx.createGain(); masterGain.gain.value = 0.9; masterGain.connect(audioCtx.destination);
-    const hbOsc = audioCtx.createOscillator(); hbOsc.type='sine'; hbOsc.frequency.value=32; heartbeatGain = audioCtx.createGain(); heartbeatGain.gain.value=0; hbOsc.connect(heartbeatGain); heartbeatGain.connect(masterGain); hbOsc.start();
-    const bufferSize = 2*audioCtx.sampleRate; const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate); const data = noiseBuffer.getChannelData(0); for(let i=0;i<bufferSize;i++) data[i]=(Math.random()*2-1)*0.18; noiseNode = audioCtx.createBufferSource(); noiseNode.buffer=noiseBuffer; noiseNode.loop=true; const bp = audioCtx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=3200; bp.Q.value=0.6; noiseNode.connect(bp); metalNode = audioCtx.createGain(); metalNode.gain.value=0; bp.connect(metalNode); metalNode.connect(masterGain); noiseNode.start(); const staticBuf = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate); const sdata = staticBuf.getChannelData(0); for(let i=0;i<bufferSize;i++) sdata[i]=(Math.random()*2-1)*0.06; const staticNode = audioCtx.createBufferSource(); staticNode.buffer=staticBuf; staticNode.loop=true; staticGainNode = audioCtx.createGain(); staticGainNode.gain.value=0; staticNode.connect(staticGainNode); staticGainNode.connect(masterGain); staticNode.start(); audioMod = { setHeartbeat:(v)=>{ heartbeatGain.gain.linearRampToValueAtTime(v*0.6, audioCtx.currentTime+0.05); hbOsc.frequency.linearRampToValueAtTime(30+v*40,audioCtx.currentTime+0.05); }, setMetal:(v)=>{ metalNode.gain.linearRampToValueAtTime(v*0.9, audioCtx.currentTime+0.05); }, setStatic:(v)=>{ staticGainNode.gain.linearRampToValueAtTime(v*0.25, audioCtx.currentTime+0.05); } };
+    const hbOsc = audioCtx.createOscillator(); hbOsc.type='sine'; hbOsc.frequency.value=28; heartbeatGain = audioCtx.createGain(); heartbeatGain.gain.value=0; hbOsc.connect(heartbeatGain); heartbeatGain.connect(masterGain); hbOsc.start();
+    const bufferSize = 2*audioCtx.sampleRate; const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate); const data = noiseBuffer.getChannelData(0); for(let i=0;i<bufferSize;i++) data[i]=(Math.random()*2-1)*0.16; noiseNode = audioCtx.createBufferSource(); noiseNode.buffer=noiseBuffer; noiseNode.loop=true; const bp = audioCtx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=3200; bp.Q.value=0.6; noiseNode.connect(bp); metalNode = audioCtx.createGain(); metalNode.gain.value=0; bp.connect(metalNode); metalNode.connect(masterGain); noiseNode.start(); const staticBuf = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate); const sdata = staticBuf.getChannelData(0); for(let i=0;i<bufferSize;i++) sdata[i]=(Math.random()*2-1)*0.05; const staticNode = audioCtx.createBufferSource(); staticNode.buffer=staticBuf; staticNode.loop=true; staticGainNode = audioCtx.createGain(); staticGainNode.gain.value=0; staticNode.connect(staticGainNode); staticGainNode.connect(masterGain); staticNode.start(); audioMod = { setHeartbeat:(v)=>{ heartbeatGain.gain.linearRampToValueAtTime(v*0.6, audioCtx.currentTime+0.05); hbOsc.frequency.linearRampToValueAtTime(28+v*30,audioCtx.currentTime+0.05); }, setMetal:(v)=>{ metalNode.gain.linearRampToValueAtTime(v*0.8, audioCtx.currentTime+0.05); }, setStatic:(v)=>{ staticGainNode.gain.linearRampToValueAtTime(v*0.25, audioCtx.currentTime+0.05); } };
   }
   let audioMod={setHeartbeat:()=>{}, setMetal:()=>{}, setStatic:()=>{}};
-  function startAudioOnGesture(){ if(state.audioStarted) return; try{ initAudio(); state.audioStarted=true; }catch(e){}}
+  function startAudioOnGesture(){ if(state.audioStarted) return; try{ initAudio(); state.audioStarted=true; }catch(e){}
+  }
 
-  // Adjusted tuning values
-  const BLINK_COST = 10; // was 18 -> less punishing
-  const BLINK_COOLDOWN = 0.9; // shorter cooldown
-  const STAMINA_RECOVER_RATE = 0.012; // higher recovery
+  // Tuning
+  const BLINK_COST = 8; const BLINK_COOLDOWN = 0.7; const STAMINA_RECOVER_RATE = 0.02; // easier
 
-  function blink(){ if(state.blinkCooldown > 0.5) return; state.blinkActive=true; state.stamina = clamp(state.stamina - BLINK_COST, 0, 100); state.blinkCooldown = BLINK_COOLDOWN; blackoutTimer = 0.45; }
+  function blink(){ if(state.blinkCooldown > 0.4) return; state.blinkActive=true; state.stamina = clamp(state.stamina - BLINK_COST, 0, 100); state.blinkCooldown = BLINK_COOLDOWN; blackoutTimer = 0.35; }
+  function interact(){ // check for shard proximity
+    // simple: if near center x < 40
+    if(Math.abs(state.playerPos.x) < 36 && !pieces[0].found && state.roomTime > 1){ pieces[0].found=true; pickupShard(); }
+  }
 
+  // Rooms and visuals
   const rooms = [{id:0,name:'Intro - 수술실',desc:'깨어난다. 빛과 금속 소리, 복도에서 발소리.'},{id:1,name:'회복실',desc:'냉정한 조명과 뿌연 거울.'},{id:2,name:'복도',desc:'늘어나는 그림자와 문들.'},{id:3,name:'기억의 방',desc:'기억 조각이 흩어져 있다.'},{id:4,name:'최종실',desc:'진실과 마주하는 곳.'}];
 
-  function drawScene(dt){ const g = ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#070707'); g.addColorStop(0.6,'#0b0b0b'); g.addColorStop(1,'#060606'); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
-    const vign=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*0.2,W/2,H/2,Math.max(W,H)); vign.addColorStop(0,'rgba(0,0,0,0)'); vign.addColorStop(1,'rgba(0,0,0,0.6)'); ctx.fillStyle=vign; ctx.fillRect(0,0,W,H);
-    ctx.save(); ctx.translate(W*0.5,H*0.55); ctx.fillStyle='#050505'; ctx.fillRect(-W*0.18,-12,W*0.36,24); ctx.fillRect(-W*0.05,-60,W*0.1,48); ctx.restore(); ctx.strokeStyle='rgba(255,255,255,0.03)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(W*0.5,H*0.4); ctx.lineTo(W*0.8,H*0.9); ctx.moveTo(W*0.5,H*0.4); ctx.lineTo(W*0.2,H*0.9); ctx.stroke();
+  // Visual helpers
+  function drawScene(dt){ // brighten base a bit
+    const g = ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#111111'); g.addColorStop(0.6,'#121212'); g.addColorStop(1,'#0b0b0b'); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    // vignette softer
+    const vign = ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*0.25,W/2,H/2,Math.max(W,H)); vign.addColorStop(0,'rgba(0,0,0,0)'); vign.addColorStop(1,'rgba(0,0,0,0.5)'); ctx.fillStyle=vign; ctx.fillRect(0,0,W,H);
+    // surgical table silhouette brighter
+    ctx.save(); ctx.translate(W*0.5,H*0.55); ctx.fillStyle='#0b0b0b'; ctx.fillRect(-W*0.18,-12,W*0.36,24); ctx.fillRect(-W*0.05,-60,W*0.1,48); ctx.restore();
+    // perspective lines
+    ctx.strokeStyle='rgba(255,255,255,0.035)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(W*0.5,H*0.4); ctx.lineTo(W*0.82,H*0.9); ctx.moveTo(W*0.5,H*0.4); ctx.lineTo(W*0.18,H*0.9); ctx.stroke();
+
+    // shard indicator (first shard visible with light beam)
+    if(!pieces[0].found){ const bx = W*0.5 + 0; const by = H*0.55 - 90; const beamH = 140; const inten = 0.9; ctx.save(); const grad = ctx.createLinearGradient(bx,by,bx,by+beamH); grad.addColorStop(0,'rgba(255,240,200,'+inten+')'); grad.addColorStop(1,'rgba(255,240,200,0)'); ctx.fillStyle=grad; ctx.beginPath(); ctx.moveTo(bx-14,by); ctx.lineTo(bx+14,by); ctx.lineTo(bx+60,by+beamH); ctx.lineTo(bx-60,by+beamH); ctx.closePath(); ctx.fill(); ctx.restore(); }
+
+    // doctor silhouette with faint outline for visibility
     const closeness = clamp(1 - (state.doctorDist/60),0,1);
-    // smooth doctor movement: lerp distance instead of snap
-    state.doctorDist = lerp(state.doctorDistPrev||state.doctorDist, state.doctorDist, dt*0.004);
-    state.doctorDistPrev = state.doctorDist;
     const docX = W*0.5 + Math.sin(performance.now()*0.001 + state.roomIndex)*W*0.22*closeness;
-    const docY = H*0.15 + (1-closeness)*H*0.03; const scale=lerp(0.6,2.4,closeness);
-    ctx.save(); ctx.translate(docX,docY); ctx.scale(scale,scale); ctx.fillStyle=`rgba(8,8,8,${0.9})`; ctx.beginPath(); ctx.ellipse(0,40,18,36,0,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.ellipse(0,-6,18,18,0,0,Math.PI*2); ctx.fill(); ctx.strokeStyle='rgba(200,200,200,0.65)'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(18,-2); ctx.lineTo(52,-18); ctx.stroke(); ctx.restore();
-    if(state.staticIntensity > 0.02){ ctx.save(); ctx.globalAlpha = clamp(state.staticIntensity*0.9,0,0.9); ctx.fillStyle = `rgba(255,255,255,${0.02 + 0.05*state.staticIntensity})`; for(let i=0;i<18;i++){ ctx.fillRect(0,(i*(H/20)+(performance.now()*0.05)%6),W,1);} ctx.restore(); }
+    const docY = H*0.15 + (1-closeness)*H*0.03; const scale = lerp(0.6,2.4,closeness);
+    ctx.save(); ctx.translate(docX,docY); ctx.scale(scale,scale);
+    // outline
+    ctx.strokeStyle = 'rgba(200,200,200,'+ (0.06 + closeness*0.18) +')'; ctx.lineWidth = 6; ctx.beginPath(); ctx.ellipse(0,-6,18,18,0,0,Math.PI*2); ctx.stroke();
+    ctx.fillStyle = `rgba(6,6,6,${0.95})`; ctx.beginPath(); ctx.ellipse(0,40,18,36,0,0,Math.PI*2); ctx.fill(); ctx.beginPath(); ctx.ellipse(0,-6,18,18,0,0,Math.PI*2); ctx.fill(); ctx.strokeStyle='rgba(220,220,220,0.6)'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(18,-2); ctx.lineTo(52,-18); ctx.stroke(); ctx.restore();
+
+    // scanline when static
+    if(state.staticIntensity > 0.02){ ctx.save(); ctx.globalAlpha = clamp(state.staticIntensity*0.9,0,0.85); ctx.fillStyle = `rgba(255,255,255,${0.02 + 0.04*state.staticIntensity})`; for(let i=0;i<16;i++){ ctx.fillRect(0,(i*(H/18)+(performance.now()*0.05)%6),W,1); } ctx.restore(); }
   }
 
   function updateUI(){ staminaEl.style.width = state.stamina + '%'; const rt=Math.floor(state.roomTime); const mm=String(Math.floor(rt/60)).padStart(2,'0'); const ss=String(rt%60).padStart(2,'0'); roomTimeEl.textContent=`${mm}:${ss}`; shardsEl.textContent = `${state.shards} / 5`; }
 
-  function gameplayStep(dt){ const speed=60*(dt/1000); let mv={x:0,y:0}; if(keys['w']) mv.y-=1; if(keys['s']) mv.y+=1; if(keys['a']) mv.x-=1; if(keys['d']) mv.x+=1; if(mv.x||mv.y){ const len=Math.hypot(mv.x,mv.y)||1; state.playerPos.x += (mv.x/len)*speed; state.playerPos.y += (mv.y/len)*speed; }
-    if(state.blinkActive){ if(rand()<0.6){ state.doctorDist = clamp(state.doctorDist - (4 + rand()*10),1,120); } else { state.doctorDist = clamp(state.doctorDist - (2 + rand()*6),1,120); } state.staticIntensity = clamp(state.staticIntensity + 0.25 + rand()*0.12,0,1); state.blinkActive=false; }
-    // gradual approach
-    state.doctorDist = clamp(state.doctorDist - dt*0.0015 - (state.staticIntensity*0.0015),0.5,200);
-    if(state.blinkCooldown>0) state.blinkCooldown = clamp(state.blinkCooldown - dt/1000,0,10);
-    if(state.stamina<100 && state.blinkCooldown===0) state.stamina = clamp(state.stamina + dt*STAMINA_RECOVER_RATE,0,100);
-    const closeness = clamp(1 - (state.doctorDist/60),0,1); state.staticIntensity = clamp(lerp(state.staticIntensity,closeness,dt*0.0025),0,1);
-    audioMod.setHeartbeat(closeness); audioMod.setMetal(state.staticIntensity*0.8); audioMod.setStatic(state.staticIntensity*0.5);
-    state.roomTime += dt/1000; if(rand() < dt*0.00004 + state.staticIntensity*0.0004) state.staticIntensity = clamp(state.staticIntensity + 0.06 + rand()*0.1,0,1); if(state.doctorDist < 1.2) triggerGameOver(); }
+  function gameplayStep(dt){ const speed = 80*(dt/1000); let mv={x:0,y:0}; if(keys['w']||keys['arrowup']) mv.y -= 1; if(keys['s']||keys['arrowdown']) mv.y += 1; if(keys['a']||keys['arrowleft']) mv.x -= 1; if(keys['d']||keys['arrowright']) mv.x += 1; if(mv.x||mv.y){ const len = Math.hypot(mv.x,mv.y)||1; state.playerPos.x += (mv.x/len)*speed; state.playerPos.y += (mv.y/len)*speed; }
+    // blink
+    if(state.blinkActive){ if(rand()<0.7){ state.doctorDist = clamp(state.doctorDist - (3 + rand()*8), 1, 120); } else { state.doctorDist = clamp(state.doctorDist - (1 + rand()*4), 1, 120); } state.staticIntensity = clamp(state.staticIntensity + 0.2 + rand()*0.12,0,1); state.blinkActive=false; }
+    // gentle approach with initial grace period
+    const approachRate = (state.roomTime < state.initialGrace) ? 0.0006 : 0.0020;
+    state.doctorDist = clamp(state.doctorDist - dt*approachRate - (state.staticIntensity*0.0012), 0.5, 200);
+    if(state.blinkCooldown > 0) state.blinkCooldown = clamp(state.blinkCooldown - dt/1000, 0, 10);
+    if(state.stamina < 100 && state.blinkCooldown === 0) state.stamina = clamp(state.stamina + dt*STAMINA_RECOVER_RATE, 0, 100);
+    const closeness = clamp(1 - (state.doctorDist/60),0,1); state.staticIntensity = clamp(lerp(state.staticIntensity,closeness, dt*0.002),0,1);
+    audioMod.setHeartbeat(closeness); audioMod.setMetal(state.staticIntensity*0.75); audioMod.setStatic(state.staticIntensity*0.45);
+    state.roomTime += dt/1000; if(rand() < dt*0.00003 + state.staticIntensity*0.00035) state.staticIntensity = clamp(state.staticIntensity + 0.05 + rand()*0.08,0,1); if(state.doctorDist < 1.2) triggerGameOver(); }
 
-  let blackoutTimer=0;
-  function render(dt){ if(blackoutTimer>0){ ctx.fillStyle='black'; ctx.fillRect(0,0,W,H); blackoutTimer = clamp(blackoutTimer - dt/1000,0,5); audioMod.setStatic(1.0); return; } drawScene(dt); ctx.save(); ctx.fillStyle = `rgba(230,230,230, ${0.8 + state.staticIntensity*0.08})`; ctx.textAlign='center'; const baseText = (state.roomIndex===0)?'복도에서 발자국 소리...':rooms[state.roomIndex].desc; let jitter = Math.floor(state.staticIntensity*12); for(let i=0;i<2;i++){ const xj=(rand()-0.5)*jitter*4; const yj=(rand()-0.5)*jitter*1.2; ctx.font = `${20 + Math.floor(state.staticIntensity*6)}px serif`; ctx.fillText(glitchText(baseText,state.staticIntensity), W/2 + xj, H*0.28 + yj); } ctx.restore(); }
+  let blackoutTimer = 0;
+  function render(dt){ if(blackoutTimer>0){ ctx.fillStyle='black'; ctx.fillRect(0,0,W,H); blackoutTimer = clamp(blackoutTimer - dt/1000, 0, 5); audioMod.setStatic(1.0); return; } drawScene(dt); ctx.save(); ctx.fillStyle = `rgba(230,230,230, ${0.82 + state.staticIntensity*0.06})`; ctx.textAlign='center'; const baseText = (state.roomIndex===0)?'복도에서 발자국 소리...':rooms[state.roomIndex].desc; let jitter = Math.floor(state.staticIntensity*8); for(let i=0;i<2;i++){ const xj=(rand()-0.5)*jitter*3; const yj=(rand()-0.5)*jitter*1.0; ctx.font = `${18 + Math.floor(state.staticIntensity*6)}px serif`; ctx.fillText(glitchText(baseText,state.staticIntensity), W/2 + xj, H*0.28 + yj); } ctx.restore(); }
 
-  function glitchText(t,intensity){ if(intensity<0.16) return t; const arr=t.split(''); const n=Math.floor(intensity*4); for(let i=0;i<n;i++){ const idx=Math.floor(rand()*arr.length); arr[idx]=String.fromCharCode(0x2500+Math.floor(rand()*60)); } return arr.join(''); }
+  function glitchText(t,intensity){ if(intensity<0.2) return t; const arr=t.split(''); const n=Math.floor(intensity*3); for(let i=0;i<n;i++){ const idx=Math.floor(rand()*arr.length); arr[idx]=String.fromCharCode(0x2500+Math.floor(rand()*50)); } return arr.join(''); }
 
   let gameOverFlag=false; function triggerGameOver(){ if(gameOverFlag) return; gameOverFlag=true; msg.style.display='block'; msg.innerHTML = '<strong>발견됨</strong><div style="height:10px"></div><div>그가 당신의 기억을 삼켰다. 다시 시도하려면 새 게임을 시작하세요.</div><div style="height:12px"></div><button id="retry" class="btn">다시</button>' ; document.getElementById('retry').addEventListener('click',()=>location.reload()); audioMod.setHeartbeat(1.0); audioMod.setMetal(1.0); audioMod.setStatic(1.0); }
 
-  let last = performance.now(); function loop(t){ const dt = t-last; last=t; if(state.playing) gameplayStep(dt); if(state.stamina<=0 && !gameOverFlag){ blackoutTimer = 0.45; state.doctorDist = clamp(state.doctorDist - (6 + rand()*18),0.2,200); state.stamina = 8; } render(dt); updateUI(); if(state.staticIntensity>0.03 && blackoutTimer<=0){ ctx.save(); ctx.globalAlpha = clamp(state.staticIntensity*0.9,0,0.9); const count = Math.floor(160 * state.staticIntensity); for(let i=0;i<count;i++){ ctx.fillStyle = `rgba(${80+Math.floor(rand()*60)},${80+Math.floor(rand()*60)},${80+Math.floor(rand()*60)},${0.02 + rand()*0.05})`; ctx.fillRect(Math.floor(rand()*W), Math.floor(rand()*H), Math.ceil(rand()*3), Math.ceil(rand()*3)); } ctx.restore(); } requestAnimationFrame(loop); }
+  let last = performance.now(); function loop(t){ const dt = t-last; last=t; if(state.playing) gameplayStep(dt); if(state.stamina<=0 && !gameOverFlag){ blackoutTimer = 0.4; state.doctorDist = clamp(state.doctorDist - (6 + rand()*18), 0.2, 200); state.stamina = 10; } render(dt); updateUI(); // static overlay
+    if(state.staticIntensity>0.02 && blackoutTimer<=0){ ctx.save(); ctx.globalAlpha = clamp(state.staticIntensity*0.9,0,0.9); const count = Math.floor(120 * state.staticIntensity); for(let i=0;i<count;i++){ ctx.fillStyle = `rgba(${110+Math.floor(rand()*100)},${110+Math.floor(rand()*100)},${110+Math.floor(rand()*100)},${0.02 + rand()*0.04})`; ctx.fillRect(Math.floor(rand()*W), Math.floor(rand()*H), Math.ceil(rand()*3), Math.ceil(rand()*3)); } ctx.restore(); } requestAnimationFrame(loop); }
 
-  function start(){ startAudioOnGesture(); state.playing=true; state.startTime=performance.now(); state.roomTime=0; msg.style.display='none'; tut.style.display='block'; state.doctorDist = 38 + rand()*18; requestAnimationFrame(loop); }
-  startBtn.addEventListener('click', start); dismissTut.addEventListener('click', ()=>{ tut.style.display='none'; });
+  function start(){ startAudioOnGesture(); state.playing=true; state.startTime=performance.now(); state.roomTime=0; msg.style.display='none'; if(!state.tutorialShown) tut.style.display='block'; state.doctorDist = 42 + rand()*12; requestAnimationFrame(loop); }
+  startBtn.addEventListener('click', start); dismissTut.addEventListener('click', ()=>{ tut.style.display='none'; state.tutorialShown=true; });
 
   setInterval(()=>{ const closeness = clamp(1 - (state.doctorDist/60),0,1); audioMod.setHeartbeat(0.15 + closeness*0.5); }, 800);
 
-  const pieces=[{x:12,y:5,found:false}]; function checkPieces(){ if(!pieces[0].found && state.roomTime>2 && Math.abs(state.playerPos.x)<28){ pieces[0].found=true; state.shards += 1; playPickup(); showTransient('기억의 조각을 발견했다...',2400); state.stamina = clamp(state.stamina + 26,0,100); state.doctorDist = clamp(state.doctorDist + 12,0.2,200); if(state.shards >=5){ showTransient('모든 조각을 모았습니다. 탈출구를 찾아라.',4000); } } }
-  function playPickup(){ try{ if(!audioCtx) initAudio(); const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type='sine'; o.frequency.value=880; g.gain.value=0.0001; o.connect(g); g.connect(masterGain); o.start(); g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime+0.02); o.frequency.exponentialRampToValueAtTime(1320, audioCtx.currentTime+0.12); setTimeout(()=>{ o.stop(); },140); }catch(e){} }
+  // shards and pickup
+  const pieces = [{x:0,y:0,found:false}]; // center
+  function pickupShard(){ state.shards += 1; playPickup(); showTransient('기억의 조각을 획득했다',2000); state.stamina = clamp(state.stamina + 30,0,100); state.doctorDist = clamp(state.doctorDist + 18,0.2,200); if(state.shards >= 5){ showTransient('모든 조각 획득! 탈출구를 찾아라',4000); } }
+  function playPickup(){ try{ if(!audioCtx) initAudio(); const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type='sine'; o.frequency.value=660; g.gain.value=0.001; o.connect(g); g.connect(masterGain); o.start(); g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime+0.07); o.frequency.exponentialRampToValueAtTime(990, audioCtx.currentTime+0.12); setTimeout(()=>{ try{o.stop();}catch(e){} },150); }catch(e){} }
 
-  function showTransient(text,time=2000){ const el=document.createElement('div'); el.style.position='fixed'; el.style.left='50%'; el.style.top='20%'; el.style.transform='translateX(-50%)'; el.style.background='rgba(10,10,10,0.7)'; el.style.color='#fff'; el.style.padding='10px 14px'; el.style.borderRadius='8px'; el.style.zIndex=40; el.style.fontSize='14px'; el.textContent=text; document.body.appendChild(el); setTimeout(()=>{ el.style.transition='opacity 0.5s'; el.style.opacity=0; setTimeout(()=>el.remove(),600); },time); }
+  function showTransient(text,time=2000){ const el=document.createElement('div'); el.style.position='fixed'; el.style.left='50%'; el.style.top='22%'; el.style.transform='translateX(-50%)'; el.style.background='rgba(10,10,10,0.8)'; el.style.color='#fff'; el.style.padding='10px 14px'; el.style.borderRadius='8px'; el.style.zIndex=50; el.style.fontSize='14px'; el.textContent=text; document.body.appendChild(el); setTimeout(()=>{ el.style.transition='opacity 0.5s'; el.style.opacity=0; setTimeout(()=>el.remove(),600); },time); }
 
-  setInterval(()=>{ if(state.playing) checkPieces(); },700);
+  setInterval(()=>{ if(state.playing) { // automatic proximity pickup if near center
+    if(!pieces[0].found && Math.abs(state.playerPos.x) < 36 && state.roomTime > 1) { pickupShard(); pieces[0].found=true; }
+  } },600);
 
+  // initial draw
   ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H); ctx.fillStyle='#f0f0f0'; ctx.textAlign='center'; ctx.font='18px sans-serif'; ctx.fillText('The Surgeon\'s Static — 준비되면 시작을 누르세요', W/2, H/2);
-  document.body.addEventListener('touchmove', e=>{ if(state.playing) e.preventDefault(); }, {passive:false}); ['click','touchstart','keydown','pointerdown'].forEach(ev=>{ window.addEventListener(ev, ()=>startAudioOnGesture(), {once:true}); }); setInterval(()=>{},1000);
-  window.__theSurgeon={ state, stun:()=>{ state.doctorDist += 30; }, kill:()=>triggerGameOver() };
-  setInterval(()=>{ if(!state.playing) return; if(state.stamina>66 && rand() < 0.008){ blink(); } },2000);
+
+  // prevent scroll
+  document.body.addEventListener('touchmove', e=>{ if(state.playing) e.preventDefault(); }, {passive:false});
+  ['click','touchstart','keydown','pointerdown'].forEach(ev=>{ window.addEventListener(ev, ()=>startAudioOnGesture(), {once:true}); });
+
+  // touch buttons
+  touchBlink.addEventListener('click', ()=> blink()); touchInteract.addEventListener('click', ()=> interact());
+
+  window.__theSurgeon = { state, stun:()=>{ state.doctorDist += 30; }, kill:()=>triggerGameOver() };
+
 })();
 </script>
 </body>
